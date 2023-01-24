@@ -7,8 +7,8 @@
 # kubectl -n postgres exec -it  postgres-65d66bb69-st4gb -- psql -h localhost -p 5432 -d airflow -U pgadmin --password
 # kubectl -n postgres exec -it  postgres-65d66bb69-st4gb -- psql -h postgres -p 5432 -d airflow -U pgadmin -W
 #
-# kubectl -n postgres exec -it  postgres-65d66bb69-st4gb -- psql -h postgres.postgres.svc -p 5432 -d airflow -U pgadmin -W
-# kubectl -n postgres exec -it  postgres-65d66bb69-st4gb -- psql -h postgres.postgres.svc.cluster.local -p 5432 -d airflow -U pgadmin -W
+# kubectl -n postgres exec -it  postgres-65d66bb69-x7smq -- psql -h postgres.postgres.svc -p 5432 -d airflow -U pgadmin -W
+# kubectl -n postgres exec -it  postgres-65d66bb69-x7smq -- psql -h postgres.postgres.svc.cluster.local -p 5432 -d airflow -U pgadmin -W
 #
 # List all databases - \l
 # List all schemas - \dn

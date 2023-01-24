@@ -1,6 +1,8 @@
 #
 # kubectl -n postgres apply -f setup/local/postgres/postgres-nfs-volumes.yaml
 #
+# kubectl -n postgres delete -f setup/local/postgres/postgres-nfs-volumes.yaml
+#
 ---
 apiVersion: v1
 kind: PersistentVolume

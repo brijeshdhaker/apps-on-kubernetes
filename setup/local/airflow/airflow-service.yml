@@ -10,13 +10,13 @@ kind: Service
 metadata:
   name: airflow-webserver
 spec:
-  type: LoadBalancer
+  type: NodePort
   ports:
     - name: airflow-webserver
       port: 8080
       protocol: TCP
       targetPort: 8080
-#      nodePort: 31500
+      nodePort: 31500
   selector:
     app: airflow-webserver
 
