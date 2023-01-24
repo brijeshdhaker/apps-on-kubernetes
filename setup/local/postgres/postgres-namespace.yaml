@@ -1,0 +1,8 @@
+#
+# kubectl -n postgres apply -f setup/local/postgres/postgres-namespace.yaml
+#
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: postgres

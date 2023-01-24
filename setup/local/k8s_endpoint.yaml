@@ -1,0 +1,16 @@
+#
+# kubectl apply -f setup/local/k8s_endpoint.yaml
+#
+kind: "Endpoints"
+apiVersion: "v1"
+metadata:
+  name: "microk8s-cluster"
+subsets:
+  -
+    addresses:
+      -
+        ip: "10.11.0.153"
+    ports:
+      -
+        port: 16443
+        name: "k8s"

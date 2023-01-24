@@ -1,0 +1,37 @@
+#
+# kubectl -n apache-airflow apply -f setup/local/airflow/airflow-service.yml
+#
+# kubectl -n apache-airflow delete -f setup/local/airflow/airflow-service.yml
+#
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: airflow
+spec:
+  type: LoadBalancer
+  ports:
+    - name: airflow
+      port: 8080
+      protocol: TCP
+      #      nodePort: 31500
+      targetPort: 8080
+  selector:
+    app: airflow
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: airflow
+spec:
+  type: NodePort
+  ports:
+    - name: airflow
+      port: 8080
+      protocol: TCP
+      nodePort: 31500
+      targetPort: 8080
+  selector:
+    app: airflow

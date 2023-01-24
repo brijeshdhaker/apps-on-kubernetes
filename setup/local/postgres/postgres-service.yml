@@ -1,0 +1,22 @@
+#
+# kubectl -n postgres apply -f setup/local/postgres/postgres-service.yml
+#
+# kubectl -n postgres delete -f setup/local/postgres/postgres-service.yml
+#
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  type: NodePort
+  ports:
+    - name: postgres
+      port: 5432
+      protocol: TCP
+      nodePort: 31800
+      targetPort: 5432
+  selector:
+    app: postgres

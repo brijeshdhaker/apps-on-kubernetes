@@ -1,0 +1,70 @@
+#
+# kubectl -n postgres apply -f setup/local/postgres/postgres-deployment.yaml
+#
+# kubectl -n postgres delete -f setup/local/postgres/postgres-deployment.yaml
+#
+# kubectl -n postgres get pods --show-labels
+# kubectl -n postgres exec -it  postgres-65d66bb69-st4gb -- psql -h localhost -p 5432 -d airflow -U pgadmin --password
+# kubectl -n postgres exec -it  postgres-65d66bb69-st4gb -- psql -h postgres -p 5432 -d airflow -U pgadmin -W
+#
+# kubectl -n postgres exec -it  postgres-65d66bb69-st4gb -- psql -h postgres.postgres.svc -p 5432 -d airflow -U pgadmin -W
+# kubectl -n postgres exec -it  postgres-65d66bb69-st4gb -- psql -h postgres.postgres.svc.cluster.local -p 5432 -d airflow -U pgadmin -W
+#
+# List all databases - \l
+# List all schemas - \dn
+# List users and their roles - \du
+# List database tables - \dt
+# List all functions - \df
+# List all views - \dv
+# Retrieve a specific user - \du ---> \du airflow
+# Switch to another database - \c
+# Describe a table - \d   ---> \d  dag   ---> \d+ <table-name>
+# Run commands from a file - \i ---> \i psql_commands.txt
+# Save query results to a file - \o ---> \o query_results
+# Execute the last command again	\g
+# Display command history \s
+#
+# Know all available psql commands \?
+# Get help  \h ---> \h ALTER TABLE
+# Exit psql shell  \q
+#
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+        fsGroupChangePolicy: "OnRootMismatch"
+      containers:
+        - name: postgres
+          image: postgres:15.1
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: postgres-config
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgredb
+      volumes:
+        - name: postgredb
+          persistentVolumeClaim:
+            claimName: postgres
+
+---
+

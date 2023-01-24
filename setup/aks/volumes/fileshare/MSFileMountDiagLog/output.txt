@@ -1,0 +1,34 @@
+
+2022-12-27T15:34:03.850Z Checking: Create a folder MSFileMountDiagLog to save the script output
+
+2022-12-27T15:34:03.911Z Checking: Client running with Ubuntu version 22.04, kernel version is 5.15.0-56-generic
+
+2022-12-27T15:34:03.919Z Checking: Check if the dependencies for this script are installed
+
+2022-12-27T15:34:03.921Z Checking: All dependencies for the script are installed
+
+2022-12-27T15:34:03.922Z Checking: Check if cifs-utils is installed
+2022-12-27T15:34:03.925Z cifs-utils is already installed on this client
+
+2022-12-27T15:34:03.926Z Checking: Check if keyutils is installed
+2022-12-27T15:34:03.928Z Keyutils is already installed!
+
+2022-12-27T15:34:03.929Z Checking: Check if client has at least SMB2.1 support
+2022-12-27T15:34:03.931Z System supports SMB2.1
+
+2022-12-27T15:34:03.932Z Checking: Check if client has SMB 3 Encryption support 
+2022-12-27T15:34:03.934Z System supports SMB version 3
+2022-12-27T15:34:03.936Z System supports SMB version 3.1.1
+
+2022-12-27T15:34:03.937Z Checking: Check if client has been patched with the recommended kernel update for idle timeout issue
+2022-12-27T15:34:03.939Z Kernel has been patched with the fixes that prevent idle timeout issues
+
+2022-12-27T15:34:03.940Z Checking: Check if client has any connectivity issue with storage account
+
+2022-12-27T15:34:03.941Z Type the storage account name, followed by [ENTER]:
+2022-12-27T15:34:36.049Z Type the share name, followed by [ENTER]:
+2022-12-27T15:34:47.603Z Choose the Azure Environment:
+2022-12-27T15:34:56.272Z Storage account FQDN is csg100320025a786393.file.core.windows.net
+2022-12-27T15:34:56.273Z Getting the Iptables policies
+2022-12-27T15:35:10.743Z Test the storage account IP connectivity over TCP port 445
+[0;31m2022-12-27T15:35:20.870Z Error: Port 445 is not reachable from this client and the error is Connection Timeout or Error happens[0m

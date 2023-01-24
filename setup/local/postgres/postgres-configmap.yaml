@@ -1,0 +1,17 @@
+#
+# kubectl -n postgres apply -f setup/local/postgres/postgres-configmap.yaml
+#
+# kubectl -n postgres delete -f setup/local/postgres/postgres-configmap.yaml
+#
+#
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    app: postgres
+data:
+  POSTGRES_USER: pgadmin
+  POSTGRES_PASSWORD: pgadmin
+  POSTGRES_DB: airflow

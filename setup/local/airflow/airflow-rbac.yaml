@@ -1,0 +1,102 @@
+#
+# kubectl -n apache-airflow apply -f setup/local/airflow/airflow-rbac.yaml
+#
+# kubectl -n apache-airflow delete -f setup/local/airflow/airflow-rbac.yaml
+#
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: airflow-roles
+  namespace: apache-airflow
+rules:
+  - apiGroups: [""] # "" indicates the core API group
+    resources: ["services", "endpoints", "pods"]
+    verbs: [ "get", "list", "watch", "create", "update", "delete", "patch" ]
+  - apiGroups: [ "batch", "extensions" ]
+    resources: [ "jobs" ]
+    verbs: [ "get", "list", "watch", "create", "update", "delete", "patch" ]
+  - apiGroups: [""]
+    resources: ["pods/logs"]
+    verbs: [ "get", "list", "watch", "create", "update", "delete", "patch" ]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: [ "get", "list", "watch", "create", "update", "delete", "patch" ]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["list"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: airflow-rbac
+  namespace: apache-airflow
+roleRef:
+  kind: Role # This must be Role or ClusterRole
+  name: airflow-roles # This must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: airflow   # Name of the ServiceAccount
+    namespace: apache-airflow
+
+
+---
+
+# Role for spark-on-k8s-operator to create resources on cluster
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: airflow-cluster-role
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  labels:
+    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-edit: "true"
+rules:
+  - apiGroups:
+      - '*'
+    resources:
+      - '*'
+    verbs:
+      - '*'
+  - nonResourceURLs:
+      - '*'
+    verbs:
+      - '*'
+
+---
+
+# Allow airflow-worker service account access for spark-on-k8s
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: airflow-cluster-rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: airflow-cluster-role
+subjects:
+  - kind: ServiceAccount
+    name: airflow
+    namespace: apache-airflow
+
+---
+
+#apiVersion: rbac.authorization.k8s.io/v1beta1
+#kind: ClusterRoleBinding
+#metadata:
+#  name: airflow-admin-rbac
+#roleRef:
+#  kind: ClusterRole
+#  name: admin
+#  apiGroup: rbac.authorization.k8s.io
+#subjects:
+#  - kind: ServiceAccount
+#    name: airflow
+#    namespace: apache-airflow
+
+
+---
