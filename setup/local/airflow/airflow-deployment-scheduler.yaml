@@ -1,7 +1,7 @@
 #
-# kubectl -n apache-airflow apply -f setup/local/airflow/airflow-deployment.yaml
+# kubectl -n apache-airflow apply -f setup/local/airflow/airflow-deployment-scheduler.yaml
 #
-# kubectl -n apache-airflow delete -f setup/local/airflow/airflow-deployment.yaml
+# kubectl -n apache-airflow delete -f setup/local/airflow/airflow-deployment-scheduler.yaml
 #
 # kubectl -n apache-airflow logs airflow-5655f79586-8jbmd -c init
 # kubectl -n apache-airflow logs airflow-5655f79586-8jbmd -c airflow-webserver
@@ -18,71 +18,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: airflow-webserver
+  name: airflow-scheduler
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: airflow-webserver
+      app: airflow-scheduler
   template:
     metadata:
       labels:
-        app: airflow-webserver
+        app: airflow-scheduler
     spec:
       serviceAccountName: airflow
-      initContainers:
-        - name: "init"
-          image: apache/airflow:2.5.1
-          imagePullPolicy: IfNotPresent
-          volumeMounts:
-            - name: airflow-configmap
-              mountPath: /opt/airflow/airflow.cfg
-              subPath: airflow.cfg
-            - name: airflow-dags
-              mountPath: /opt/airflow/dags
-          env:
-            - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
-              valueFrom:
-                secretKeyRef:
-                  name: airflow-secrets
-                  key: sql_alchemy_conn
-          command:
-            - "airflow"
-          args:
-            - "db"
-            - "upgrade"
       containers:
-        - name: airflow-webserver
-          image: apache/airflow:2.5.1
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 8080
-          env:
-            - name: AIRFLOW_KUBE_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
-              valueFrom:
-                secretKeyRef:
-                  name: airflow-secrets
-                  key: sql_alchemy_conn
-            - name: AIRFLOW__CORE__EXECUTOR
-              value: KubernetesExecutor
-          volumeMounts:
-            - name: airflow-configmap
-              mountPath: /opt/airflow/airflow.cfg
-              subPath: airflow.cfg
-            - name: airflow-dags
-              mountPath: /opt/airflow/dags
-            - name: airflow-logs
-              mountPath: /opt/airflow/logs
-            - name: airflow-templates
-              mountPath: /opt/airflow/templates
-          command:
-            - airflow
-          args:
-            - webserver
         - name: airflow-scheduler
           image: apache/airflow:2.5.1
           imagePullPolicy: IfNotPresent

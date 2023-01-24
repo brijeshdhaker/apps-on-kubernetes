@@ -1,7 +1,7 @@
 #
-# kubectl -n apache-airflow apply -f setup/local/airflow/airflow-deployment.yaml
+# kubectl -n apache-airflow apply -f setup/local/airflow/airflow-deployment-webserver.yaml
 #
-# kubectl -n apache-airflow delete -f setup/local/airflow/airflow-deployment.yaml
+# kubectl -n apache-airflow delete -f setup/local/airflow/airflow-deployment-webserver.yaml
 #
 # kubectl -n apache-airflow logs airflow-5655f79586-8jbmd -c init
 # kubectl -n apache-airflow logs airflow-5655f79586-8jbmd -c airflow-webserver
@@ -50,6 +50,7 @@ spec:
             - "airflow"
           args:
             - "db"
+#            - "init"
             - "upgrade"
       containers:
         - name: airflow-webserver
@@ -83,35 +84,6 @@ spec:
             - airflow
           args:
             - webserver
-        - name: airflow-scheduler
-          image: apache/airflow:2.5.1
-          imagePullPolicy: IfNotPresent
-          env:
-            - name: AIRFLOW_KUBE_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
-              valueFrom:
-                secretKeyRef:
-                  name: airflow-secrets
-                  key: sql_alchemy_conn
-            - name: AIRFLOW__CORE__EXECUTOR
-              value: KubernetesExecutor
-          volumeMounts:
-            - name: airflow-configmap
-              mountPath: /opt/airflow/airflow.cfg
-              subPath: airflow.cfg
-            - name: airflow-dags
-              mountPath: /opt/airflow/dags
-            - name: airflow-logs
-              mountPath: /opt/airflow/logs
-            - name: airflow-templates
-              mountPath: /opt/airflow/templates
-          command:
-            - airflow
-          args:
-            - scheduler
       restartPolicy: Always
       volumes:
         - name: airflow-dags
