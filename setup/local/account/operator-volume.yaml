@@ -1,0 +1,42 @@
+#
+# kubectl -n spark-operator apply -f setup/local/account/operator-volume.yaml
+#
+# kubectl -n spark-operator delete -f setup/local/account/operator-volume.yaml
+#
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: spark-volume
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=4.2
+  nfs:
+    path: /mnt/nfs_share/spark-apps
+    server: 192.168.122.1
+    readOnly: false
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: spark-volume
+  labels:
+    vol: spark-volume
+spec:
+  storageClassName: ""
+  volumeName: "spark-volume"
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+
+---

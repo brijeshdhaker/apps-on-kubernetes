@@ -1,15 +1,15 @@
 #
-# kubectl -n apache-airflow apply -f setup/local/airflow/airflow-rbac.yaml
+# kubectl -n prometheus apply -f setup/local/prometheus/prometheus-rbac.yaml
 #
-# kubectl -n apache-airflow delete -f setup/local/airflow/airflow-rbac.yaml
+# kubectl -n prometheus delete -f setup/local/prometheus/prometheus-rbac.yaml
 #
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: airflow-roles
-  namespace: apache-airflow
+  name: prometheus-roles
+  namespace: prometheus
 rules:
   - apiGroups: [""] # "" indicates the core API group
     resources: ["services", "endpoints", "pods"]
@@ -32,16 +32,16 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: airflow-rbac
-  namespace: apache-airflow
+  name: prometheus-rbac
+  namespace: prometheus
 roleRef:
   kind: Role # This must be Role or ClusterRole
-  name: airflow-roles # This must match the name of the Role or ClusterRole you wish to bind to
+  name: prometheus-roles # This must match the name of the Role or ClusterRole you wish to bind to
   apiGroup: rbac.authorization.k8s.io
 subjects:
   - kind: ServiceAccount
-    name: airflow   # Name of the ServiceAccount
-    namespace: apache-airflow
+    name: prometheus   # Name of the ServiceAccount
+    namespace: prometheus
 
 
 ---
@@ -50,7 +50,7 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: airflow-cluster-role
+  name: prometheus-cluster-role
   annotations:
     rbac.authorization.kubernetes.io/autoupdate: "true"
   labels:
@@ -69,23 +69,23 @@ rules:
 
 ---
 
-# Allow airflow-worker service account access for spark-on-k8s
+# Allow prometheus-worker service account access for spark-on-k8s
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: airflow-cluster-rbac
+  name: prometheus-cluster-rbac
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: airflow-cluster-role
+  name: prometheus-cluster-role
 subjects:
   - kind: ServiceAccount
-    name: airflow
-    namespace: apache-airflow
+    name: prometheus
+    namespace: prometheus
 
 ---
 #
-# kubectl create clusterrolebinding airflow-cluster-admin-binding --clusterrole=cluster-admin --serviceaccount=apache-airflow:airflow --dry-run -o yaml
+# kubectl create clusterrolebinding prometheus-cluster-admin-binding --clusterrole=cluster-admin --serviceaccount=prometheus:prometheus --dry-run -o yaml
 #
 ---
 
@@ -93,15 +93,15 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   creationTimestamp: null
-  name: airflow-cluster-admin-binding
+  name: prometheus-cluster-admin-binding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: cluster-admin
 subjects:
   - kind: ServiceAccount
-    name: airflow
-    namespace: apache-airflow
+    name: prometheus
+    namespace: prometheus
 
 
 

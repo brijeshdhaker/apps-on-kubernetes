@@ -1,0 +1,65 @@
+#
+# kubectl -n apache-airflow apply -f dag/spark_pi.yaml
+#
+# kubectl -n apache-airflow get sparkapplications spark-pi -o=yaml
+#
+# kubectl describe sparkapplication spark-pi
+#
+---
+apiVersion: "sparkoperator.k8s.io/v1beta2"
+kind: SparkApplication
+metadata:
+  name: "spark-pi"
+  namespace: apache-airflow
+spec:
+  type: Scala
+  mode: cluster
+  image: "brijeshdhaker/spark:v3.1.1"
+  imagePullPolicy: Always
+  mainClass: org.apache.spark.examples.SparkPi
+  mainApplicationFile: "local:///opt/spark/examples/jars/spark-examples_2.12-3.1.1.jar"
+  sparkConf:
+    spark.metrics.conf: /etc/metrics/conf/metrics.properties
+  sparkVersion: "3.1.1"
+  restartPolicy:
+    type: Never
+  volumes:
+    - name: spark-volume
+      persistentVolumeClaim:
+        claimName: airflow-dags
+  driver:
+    cores: 1
+    coreLimit: "1200m"
+    memory: "512m"
+    javaOptions: ""
+    labels:
+      version: 3.1.1
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "9090"
+      prometheus.io/path: "/metrics"
+    serviceAccount: airflow
+    volumeMounts:
+      - name: "spark-volume"
+        mountPath: "/mnt/apps"
+  executor:
+    cores: 1
+    instances: 1
+    memory: "512m"
+    javaOptions: ""
+    labels:
+      version: 3.1.1
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "9090"
+      prometheus.io/path: "/metrics"
+    volumeMounts:
+      - name: "spark-volume"
+        mountPath: "/mnt/apps"
+#
+  monitoring:
+    exposeDriverMetrics: true
+    exposeExecutorMetrics: true
+    prometheus:
+      jmxExporterJar: "/prometheus/jmx_prometheus_javaagent-0.11.0.jar"
+      port: 9090

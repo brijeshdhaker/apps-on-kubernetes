@@ -1,7 +1,7 @@
 #
-# kubectl -n apache-airflow apply -f setup/local/airflow/airflow-service.yml
+# kubectl -n apache-airflow apply -f setup/local/airflow/airflow-service.yaml
 #
-# kubectl -n apache-airflow delete -f setup/local/airflow/airflow-service.yml
+# kubectl -n apache-airflow delete -f setup/local/airflow/airflow-service.yaml
 #
 ---
 
