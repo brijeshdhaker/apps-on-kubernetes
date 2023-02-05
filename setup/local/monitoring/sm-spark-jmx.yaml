@@ -1,0 +1,31 @@
+#
+# kubectl -n monitoring apply -f setup/local/monitoring/sm-spark-jmx.yaml
+#
+# kubectl -n monitoring apply -f setup/local/monitoring/sm-spark-jmx.yaml
+#
+#
+# kubectl port-forward svc/spark-pi-90889185fcba4750-driver-svc 4040:4040
+#
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/name: sm-spark-jmx
+    app.kubernetes.io/component: spark-apps
+    app.kubernetes.io/metrics-by: jmx
+    release:  prometheus
+  name: sm-spark-jmx
+  namespace: monitoring
+spec:
+  endpoints:
+    - port: spark-apps-jmx-service
+      interval: 5s
+      path: /metrics
+  namespaceSelector:
+    matchNames:
+      - spark-apps
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: spark-apps-jmx-service
+---

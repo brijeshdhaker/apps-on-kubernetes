@@ -3,12 +3,12 @@
 #
 # kubectl -n apache-airflow delete -f setup/local/airflow/airflow-deployment.yaml
 #
-# kubectl -n apache-airflow logs airflow-webserver-6c45d49d66-gfjb9 -c init
-# kubectl -n apache-airflow logs airflow-webserver-6c45d49d66-gfjb9 -c airflow-webserver
-# kubectl -n apache-airflow logs airflow-webserver-6c45d49d66-gfjb9 -c airflow-scheduler
-# kubectl -n apache-airflow exec -it airflow-webserver-6c45d49d66-gfjb9 -c airflow-webserver -- /bin/bash
+# kubectl -n apache-airflow logs airflow-webserver-6c45d49d66-l4lpk -c init
+# kubectl -n apache-airflow logs airflow-webserver-6c45d49d66-l4lpk -c airflow-webserver
+# kubectl -n apache-airflow logs airflow-webserver-6c45d49d66-l4lpk -c airflow-scheduler
+# kubectl -n apache-airflow exec -it airflow-webserver-6c45d49d66-l4lpk -c airflow-webserver -- /bin/bash
 #
-# kubectl -n apache-airflow exec -it airflow-webserver-6c45d49d66-gfjb9 -c airflow-scheduler -- /bin/bash
+# kubectl -n apache-airflow exec -it airflow-webserver-6c45d49d66-l4lpk -c airflow-scheduler -- /bin/bash
 #
 # kubectl -n apache-airflow get pods --show-labels
 # kubectl -n apache-airflow delete pods -l kubernetes_executor=True and spark-role=driver

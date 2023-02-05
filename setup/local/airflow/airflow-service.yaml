@@ -3,6 +3,7 @@
 #
 # kubectl -n apache-airflow delete -f setup/local/airflow/airflow-service.yaml
 #
+# kubectl -n apache-airflow port-forward svc/airflow-webserver 4040:4040
 ---
 
 apiVersion: v1

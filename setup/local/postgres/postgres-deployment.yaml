@@ -4,8 +4,8 @@
 # kubectl -n postgres delete -f setup/local/postgres/postgres-deployment.yaml
 #
 # kubectl -n postgres get pods --show-labels
-# kubectl -n postgres exec -it  postgres-65d66bb69-st4gb -- psql -h localhost -p 5432 -d airflow -U pgadmin --password
-# kubectl -n postgres exec -it  postgres-65d66bb69-st4gb -- psql -h postgres -p 5432 -d airflow -U pgadmin -W
+# kubectl -n postgres exec -it  postgres-65d66bb69-gdtj5 -- psql -h localhost -p 5432 -d airflow -U pgadmin --password
+# kubectl -n postgres exec -it  postgres-65d66bb69-gdtj5 -- psql -h postgres -p 5432 -d airflow -U pgadmin -W
 #
 # kubectl -n postgres exec -it  postgres-65d66bb69-x7smq -- psql -h postgres.postgres.svc -p 5432 -d airflow -U pgadmin -W
 # kubectl -n postgres exec -it  postgres-65d66bb69-x7smq -- psql -h postgres.postgres.svc.cluster.local -p 5432 -d airflow -U pgadmin -W

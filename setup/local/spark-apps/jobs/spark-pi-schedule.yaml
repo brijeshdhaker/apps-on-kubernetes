@@ -1,0 +1,57 @@
+#
+# kubectl -n spark-apps apply -f setup/local/spark-apps/jobs/spark-pi-schedule.yaml
+# kubectl -n spark-apps get ScheduledSparkApplication spark-pi-scheduled -o=yaml
+#
+# kubectl -n spark-apps delete -f setup/local/spark-apps/jobs/spark-pi-schedule.yaml
+# kubectl -n spark-apps delete ScheduledSparkApplication spark-pi-scheduled
+#
+# kubectl -n spark-apps describe ScheduledSparkApplication spark-pi-scheduled
+#
+
+apiVersion: "sparkoperator.k8s.io/v1beta2"
+kind: ScheduledSparkApplication
+metadata:
+  name: spark-pi-scheduled
+  namespace: spark-apps
+spec:
+  schedule: "@every 10m"
+  concurrencyPolicy: Allow
+  template:
+    type: Scala
+    mode: cluster
+    image: "docker.io/brijeshdhaker/spark:3.1.2"
+    imagePullPolicy: Always
+    mainClass: org.apache.spark.examples.SparkPi
+    mainApplicationFile: "local:///opt/spark/examples/jars/spark-examples_2.12-3.1.2.jar"
+    arguments:
+      - "10000"
+    sparkConf:
+      spark.ui.prometheus.enabled: "true"
+      spark.executor.processTreeMetrics.enabled: "true"
+    sparkVersion: "3.1.2"
+    restartPolicy:
+      type: Never
+    driver:
+      cores: 1
+      memory: "640m"
+      labels:
+        app.kubernetes.io/version: 3.1.2
+        app.kubernetes.io/component: spark-driver
+        app.kubernetes.io/part-of: spark
+        app.kubernetes.io/managed-by: self
+        app.kubernetes.io/metrics-by: prometheus
+        version: 3.1.2
+      serviceAccount: spark
+      javaOptions: "-Dapp.name=spark-pi-scheduled"
+    executor:
+      cores: 1
+      instances: 2
+      memory: "640m"
+      labels:
+        app.kubernetes.io/version: 3.1.2
+        app.kubernetes.io/component: spark-driver
+        app.kubernetes.io/part-of: spark
+        app.kubernetes.io/managed-by: self
+        app.kubernetes.io/metrics-by: prometheus
+        version: 3.1.2
+      javaOptions: "-Dapp.name=spark-pi-scheduled"

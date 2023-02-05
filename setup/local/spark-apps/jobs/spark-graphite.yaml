@@ -1,0 +1,63 @@
+#
+# kubectl -n spark-apps apply -f setup/local/spark-apps/jobs/spark-graphite.yaml
+#
+# kubectl -n spark-apps delete -f setup/local/spark-apps/jobs/spark-graphite.yaml
+#
+# kubectl -n spark-apps get sparkapplications spark-graphite -o=yaml
+#
+# kubectl -n spark-apps delete sparkapplications spark-graphite
+#
+# kubectl -n spark-apps describe sparkapplication spark-graphite
+#
+
+apiVersion: "sparkoperator.k8s.io/v1beta2"
+kind: SparkApplication
+metadata:
+  name: spark-graphite
+  namespace: spark-apps
+spec:
+  type: Scala
+  mode: cluster
+  image: "docker.io/brijeshdhaker/spark:3.1.2"
+  imagePullPolicy: Always
+  mainClass: org.apache.spark.examples.SparkPi
+  mainApplicationFile: "local:///opt/spark/examples/jars/spark-examples_2.12-3.1.2.jar"
+  arguments:
+    - "10000"
+  sparkConf:
+    spark.metrics.conf: "metrics.properties"
+    spark.metrics.conf.driver.sink.graphite.class: "org.apache.spark.metrics.sink.GraphiteSink"
+    spark.metrics.conf.executor.sink.graphite.class: "org.apache.spark.metrics.sink.GraphiteSink"
+    spark.metrics.conf.*.sink.graphite.host: "influxdb.influxdb"
+    spark.metrics.conf.*.sink.graphite.port: "2003"
+    spark.metrics.conf.*.sink.graphite.period: "10"
+    spark.metrics.conf.*.sink.graphite.unit: "seconds"
+    spark.metrics.conf.*.sink.graphite.prefix: "lucatest"
+    spark.metrics.conf.*.source.jvm.class: "org.apache.spark.metrics.source.JvmSource"
+    spark.metrics.staticSources.enabled: "true"
+    spark.metrics.appStatusSource.enabled: "true"
+  sparkVersion: "3.0.0"
+  restartPolicy:
+    type: Never
+  driver:
+    cores: 1
+    memory: "512m"
+    labels:
+      app.kubernetes.io/version: 3.0.0
+      app.kubernetes.io/component: spark-driver
+      app.kubernetes.io/part-of: spark
+      app.kubernetes.io/managed-by: self
+      app.kubernetes.io/metrics-by: graphite
+    serviceAccount: spark
+    javaOptions: "-Dapp.name=spark-pi-graphite"
+  executor:
+    cores: 1
+    instances: 2
+    memory: "512m"
+    labels:
+      app.kubernetes.io/version: 3.0.0
+      app.kubernetes.io/component: spark-executor
+      app.kubernetes.io/part-of: spark
+      app.kubernetes.io/managed-by: self
+      app.kubernetes.io/metrics-by: graphite
+    javaOptions: "-Dapp.name=spark-pi-graphite"

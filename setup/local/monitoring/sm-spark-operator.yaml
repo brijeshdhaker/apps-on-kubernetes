@@ -1,0 +1,39 @@
+#
+# kubectl -n monitoring apply -f setup/local/monitoring/sm-spark-operator.yaml
+#
+# kubectl -n monitoring delete -f setup/local/monitoring/sm-spark-operator.yaml
+#
+# kubectl -n monitoring port-forward svc/sparkoperator-metrics-service 10254:10254
+#
+---
+
+#apiVersion: monitoring.coreos.com/v1
+#kind: Prometheus
+#metadata:
+#  name: spark-prometheus
+#spec:
+#  serviceMonitorSelector:
+#    matchLabels:
+#      spark-role: driver
+#  enableAdminAPI: false
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/name: sm-spark-operator
+    release:  prometheus
+  name: sm-spark-operator
+  namespace: monitoring
+spec:
+  endpoints:
+    - port: spark-operator-metrics
+      interval: 5s
+      path: /metrics
+  namespaceSelector:
+    matchNames:
+      - spark-operator
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: spark-operator-service

@@ -1,0 +1,42 @@
+#
+# kubectl -n monitoring apply -f setup/local/monitoring/sm-spark-prometheus.yaml
+#
+# kubectl -n monitoring apply -f setup/local/monitoring/sm-spark-prometheus.yaml
+#
+#
+# kubectl port-forward svc/spark-pi-90889185fcba4750-driver-svc 4040:4040
+#
+---
+
+#apiVersion: monitoring.coreos.com/v1
+#kind: Prometheus
+#metadata:
+#  name: spark-prometheus
+#spec:
+#  serviceMonitorSelector:
+#    matchLabels:
+#      spark-role: driver
+#  enableAdminAPI: false
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/name: sm-spark-prometheus
+    app.kubernetes.io/component: spark-apps
+    release:  prometheus
+  name: sm-spark-prometheus
+  namespace: monitoring
+spec:
+  endpoints:
+    - port: spark-apps-prometheus-service
+      interval: 5s
+      path: /metrics/executors/prometheus/
+  namespaceSelector:
+    matchNames:
+      - spark-apps
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: spark-apps-prometheus-service
+---
