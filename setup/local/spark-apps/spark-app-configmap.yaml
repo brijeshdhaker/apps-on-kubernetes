@@ -1,12 +1,14 @@
-# kubectl -n k8s-spark create cm spark-configs  \
+# kubectl -n k8s-spark create cm spark-apps-configmap  \
 # --from-file=spark-defaults.conf=setup/local/history-server/spark-defaults.conf \
 # --from-file=spark.logserver.conf=setup/local/history-server/spark.logserver.conf \
 # --from-literal=workload=HistoryServer \
 # --dry-run=client -o yaml
 
 #
-# kubectl -n k8s-spark apply -f setup/local/history-server/spark-hs-configmap.yaml
-# kubectl -n k8s-spark delete -f setup/local/history-server/spark-hs-configmap.yaml
+# kubectl -n spark-apps apply -f setup/local/spark-apps/spark-app-configmap.yaml
+#
+# kubectl -n spark-apps delete -f setup/local/spark-apps/spark-app-configmap.yaml
+#
 ---
 apiVersion: v1
 data:
@@ -15,43 +17,49 @@ data:
     spark.serializer                          org.apache.spark.serializer.KryoSerializer
 
     #
-    # spark.driver.memory                     5g
-    # spark.executor.extraJavaOptions         -XX:+PrintGCDetails -Dkey=value -Dnumbers="one two three"
-    #
-
-    #
-    # Enable Spark jobs to Log In HDFS
-    #
-    spark.eventLog.enabled                    true
-    spark.eventLog.dir                        file:///opt/spark/logs/
-    spark.eventLog.rolling.enabled            true
-    spark.eventLog.rolling.maxFileSize        128m
-    
+  spark.logserver.conf: |-
     #
     # History Server Related Properties
     #
     spark.history.provider                    org.apache.spark.deploy.history.FsHistoryProvider
-    spark.history.fs.logDirectory             file:///opt/spark/logs/
+    spark.history.fs.logDirectory             file:///mnt/nfs_share/spark-logs/
     spark.history.fs.update.interval          10s
     spark.history.ui.port                     18080
     spark.yarn.historyServer.allowTracking    true
-
-    #
-    #
-    #
-    spark.ui.enabled                          false
-    spark.ui.port                             18080
-    spark.ui.filters                          org.apache.spark.deploy.yarn.YarnProxyRedirectFilter
     
     #
     #
-  metrics.properties: |-
-
+  graphite.metrics.properties: |-
+    # Example configuration for Graphite sink
+    *.sink.graphite.class=org.apache.spark.metrics.sink.GraphiteSink
+    *.sink.graphite.host=influxdb.influxdb.svc.cluster.local
+    *.sink.graphite.port=2003
+    *.sink.graphite.period=10
+    *.sink.graphite.unit=seconds
+    *.sink.graphite.prefix=graphite
+    
+    # Enable JvmSource for instance master, worker, driver and executor
+    master.source.jvm.class=org.apache.spark.metrics.source.JvmSource
+    worker.source.jvm.class=org.apache.spark.metrics.source.JvmSource
+    driver.source.jvm.class=org.apache.spark.metrics.source.JvmSource
+    executor.source.jvm.class=org.apache.spark.metrics.source.JvmSource
+    
     #
     #
-  workload: HistoryServer
+  prometheus.metrics.properties: |-
+    #
+    # Example configuration for PrometheusServlet
+    #
+    *.sink.prometheusServlet.class=org.apache.spark.metrics.sink.PrometheusServlet
+    *.sink.prometheusServlet.path=/metrics/prometheus
+    *.sink.prometheusServlet.prefix=spark_prometheus
+    master.sink.prometheusServlet.path=/metrics/master/prometheus
+    applications.sink.prometheusServlet.path=/metrics/applications/prometheus
+    
+    #
+    #
 kind: ConfigMap
 metadata:
   creationTimestamp: "2022-12-26T20:43:44Z"
-  name: spark-configs
-  namespace: k8s-spark
+  name: spark-apps-configmap
+  namespace: spark-apps

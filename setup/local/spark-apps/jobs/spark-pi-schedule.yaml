@@ -1,20 +1,20 @@
 #
 # kubectl -n spark-apps apply -f setup/local/spark-apps/jobs/spark-pi-schedule.yaml
-# kubectl -n spark-apps get ScheduledSparkApplication spark-pi-scheduled -o=yaml
-#
 # kubectl -n spark-apps delete -f setup/local/spark-apps/jobs/spark-pi-schedule.yaml
+#
+# kubectl -n spark-apps get ScheduledSparkApplication spark-pi-scheduled
+# kubectl -n spark-apps get ScheduledSparkApplication spark-pi-scheduled -o=yaml
+# kubectl -n spark-apps describe ScheduledSparkApplication spark-pi-scheduled
 # kubectl -n spark-apps delete ScheduledSparkApplication spark-pi-scheduled
 #
-# kubectl -n spark-apps describe ScheduledSparkApplication spark-pi-scheduled
-#
-
+---
 apiVersion: "sparkoperator.k8s.io/v1beta2"
 kind: ScheduledSparkApplication
 metadata:
   name: spark-pi-scheduled
   namespace: spark-apps
 spec:
-  schedule: "@every 10m"
+  schedule: "@every 5m"
   concurrencyPolicy: Allow
   template:
     type: Scala
@@ -26,11 +26,32 @@ spec:
     arguments:
       - "10000"
     sparkConf:
+      spark.metrics.conf: "/opt/spark/metrics/metrics.properties"
+      spark.metrics.staticSources.enabled: "true"
+      spark.metrics.appStatusSource.enabled: "true"
       spark.ui.prometheus.enabled: "true"
       spark.executor.processTreeMetrics.enabled: "true"
     sparkVersion: "3.1.2"
     restartPolicy:
       type: Never
+    volumes:
+      - name: "nfs-volume"
+        nfs:
+          path: "/mnt/nfs_share"
+          server: "192.168.122.1"
+      - name: "host-volume"
+        hostPath:
+          path: "/mnt/local-share"
+          type: Directory
+      - name: "spark-volume"
+        persistentVolumeClaim:
+          claimName: "spark-volume"
+      - name: "configmap-volume"
+        configMap:
+          name: "spark-apps-configmap"
+          items:
+            - key: "prometheus.metrics.properties"
+              path: "metrics.properties"
     driver:
       cores: 1
       memory: "640m"
@@ -42,10 +63,17 @@ spec:
         app.kubernetes.io/metrics-by: prometheus
         version: 3.1.2
       serviceAccount: spark
+      volumeMounts:
+        - name: "nfs-volume"
+          mountPath: "/mnt/nfs_share"
+        - name: "configmap-volume"
+          mountPath: "/opt/spark/metrics"
+        - name: "spark-volume"
+          mountPath: "/mnt/spark-apps"
       javaOptions: "-Dapp.name=spark-pi-scheduled"
     executor:
       cores: 1
-      instances: 2
+      instances: 1
       memory: "640m"
       labels:
         app.kubernetes.io/version: 3.1.2
@@ -54,4 +82,11 @@ spec:
         app.kubernetes.io/managed-by: self
         app.kubernetes.io/metrics-by: prometheus
         version: 3.1.2
+      volumeMounts:
+        - name: "nfs-volume"
+          mountPath: "/mnt/nfs_share"
+        - name: "configmap-volume"
+          mountPath: "/opt/spark/metrics"
+        - name: "spark-volume"
+          mountPath: "/mnt/spark-apps"
       javaOptions: "-Dapp.name=spark-pi-scheduled"
