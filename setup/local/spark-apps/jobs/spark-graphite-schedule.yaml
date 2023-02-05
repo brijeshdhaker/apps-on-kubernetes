@@ -1,0 +1,108 @@
+#
+# kubectl -n spark-apps apply -f setup/local/spark-apps/jobs/spark-graphite-schedule.yaml
+# kubectl -n spark-apps delete -f setup/local/spark-apps/jobs/spark-graphite-schedule.yaml
+#
+# kubectl -n spark-apps get ScheduledSparkApplication spark-pi-graphite-schedule
+# kubectl -n spark-apps get ScheduledSparkApplication spark-pi-graphite-schedule -o=yaml
+# kubectl -n spark-apps describe ScheduledSparkApplication spark-pi-graphite-schedule
+# kubectl -n spark-apps delete ScheduledSparkApplication spark-pi-graphite-schedule
+#
+---
+apiVersion: "sparkoperator.k8s.io/v1beta2"
+kind: ScheduledSparkApplication
+metadata:
+  name: spark-pi-graphite-schedule
+  namespace: spark-apps
+spec:
+  schedule: "@every 5m"
+  concurrencyPolicy: Allow
+  successfulRunHistoryLimit: 1
+  failedRunHistoryLimit: 2
+  template:
+    type: Scala
+    mode: cluster
+    image: "docker.io/brijeshdhaker/spark:3.1.2"
+    imagePullPolicy: Always
+    mainClass: org.apache.spark.examples.SparkPi
+    mainApplicationFile: "local:///opt/spark/examples/jars/spark-examples_2.12-3.1.2.jar"
+    arguments:
+      - "10000"
+    deps:
+      jars: []
+      packages:
+        - "ch.cern.sparkmeasure:spark-measure_2.12:0.22"
+      excludePackages: []
+      repositories: []
+    sparkConf:
+      spark.metrics.conf: "/opt/spark/metrics/metrics.properties"
+      spark.metrics.staticSources.enabled: "true"
+      spark.metrics.appStatusSource.enabled: "true"
+      spark.executor.processTreeMetrics.enabled: "true"
+      spark.extraListeners: "ch.cern.sparkmeasure.InfluxDBSink,ch.cern.sparkmeasure.InfluxDBSinkExtended"
+      spark.sparkmeasure.influxdbURL: "http://influxdb.influxdb.svc.cluster.local:8086"
+      spark.sparkmeasure.influxdbUsername: ""
+      spark.sparkmeasure.influxdbPassword: ""
+      spark.sparkmeasure.influxdbName: "sparkmeasure"
+      spark.sparkmeasure.influxdbStagemetrics: "true"
+      spark.sparkmeasure.influxdbEnableBatch: "true"
+    sparkVersion: "3.1.2"
+    restartPolicy:
+      type: Never
+    volumes:
+      - name: "nfs-volume"
+        nfs:
+          path: "/mnt/nfs_share"
+          server: "192.168.122.1"
+      - name: "host-volume"
+        hostPath:
+          path: "/mnt/local-share"
+          type: Directory
+      - name: "spark-volume"
+        persistentVolumeClaim:
+          claimName: "spark-volume"
+      - name: "configmap-volume"
+        configMap:
+          name: "spark-apps-configmap"
+          items:
+            - key: "graphite.metrics.properties"
+              path: "metrics.properties"
+    driver:
+      cores: 1
+      coreLimit: "1000m"
+      memory: "640m"
+      labels:
+        app.kubernetes.io/version: 3.1.2
+        app.kubernetes.io/component: spark-driver
+        app.kubernetes.io/part-of: spark
+        app.kubernetes.io/managed-by: self
+        app.kubernetes.io/metrics-by: graphite
+        version: 3.1.2
+      serviceAccount: spark
+      volumeMounts:
+        - name: "nfs-volume"
+          mountPath: "/mnt/nfs_share"
+        - name: "configmap-volume"
+          mountPath: "/opt/spark/metrics"
+        - name: "spark-volume"
+          mountPath: "/mnt/spark-apps"
+      javaOptions: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dapp.name=spark-pi-graphite-schedule -Divy.cache.dir=/tmp -Divy.home=/tmp"
+    executor:
+      cores: 1
+      coreLimit: "1000m"
+      instances: 1
+      memory: "640m"
+      labels:
+        app.kubernetes.io/version: 3.1.2
+        app.kubernetes.io/component: spark-driver
+        app.kubernetes.io/part-of: spark
+        app.kubernetes.io/managed-by: self
+        app.kubernetes.io/metrics-by: graphite
+        version: 3.1.2
+      volumeMounts:
+        - name: "nfs-volume"
+          mountPath: "/mnt/nfs_share"
+        - name: "configmap-volume"
+          mountPath: "/opt/spark/metrics"
+        - name: "spark-volume"
+          mountPath: "/mnt/spark-apps"
+      javaOptions: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dapp.name=spark-pi-graphite-schedule -Divy.cache.dir=/tmp -Divy.home=/tmp"

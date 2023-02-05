@@ -9,15 +9,12 @@
 #
 # kubectl -n spark-apps describe sparkapplication spark-pi-graphite
 #
-
+---
 apiVersion: "sparkoperator.k8s.io/v1beta2"
 kind: SparkApplication
 metadata:
   name: spark-pi-graphite
   namespace: spark-apps
-  labels:
-    app.kubernetes.io/name: spark-pi-graphite
-    app.kubernetes.io/version: 3.1.2
 spec:
   type: Scala
   mode: cluster
@@ -25,12 +22,23 @@ spec:
   imagePullPolicy: Always
   mainClass: org.apache.spark.examples.SparkPi
   mainApplicationFile: "local:///opt/spark/examples/jars/spark-examples_2.12-3.1.2.jar"
-  arguments:
-    - "10000"
+  deps:
+    packages:
+      - "ch.cern.sparkmeasure:spark-measure_2.12:0.22"
   sparkConf:
     spark.metrics.conf: "/opt/spark/metrics/metrics.properties"
     spark.metrics.staticSources.enabled: "true"
     spark.metrics.appStatusSource.enabled: "true"
+    spark.executor.processTreeMetrics.enabled: "true"
+    spark.extraListeners: "ch.cern.sparkmeasure.InfluxDBSink,ch.cern.sparkmeasure.InfluxDBSinkExtended"
+    spark.sparkmeasure.influxdbURL: "http://influxdb.influxdb.svc.cluster.local:8086"
+    spark.sparkmeasure.influxdbUsername: ""
+    spark.sparkmeasure.influxdbPassword: ""
+    spark.sparkmeasure.influxdbName: "sparkmeasure"
+    spark.sparkmeasure.influxdbStagemetrics: "true"
+    spark.sparkmeasure.influxdbEnableBatch: "true"
+  arguments:
+    - "50000"
   sparkVersion: "3.1.2"
   restartPolicy:
     type: Never
@@ -54,15 +62,16 @@ spec:
             path: "metrics.properties"
   driver:
     cores: 1
+    coreLimit: "1000m"
     memory: "512m"
     labels:
       app.kubernetes.io/version: 3.1.2
       app.kubernetes.io/component: spark-driver
       app.kubernetes.io/part-of: spark
       app.kubernetes.io/managed-by: self
-      app.kubernetes.io/metrics-by: graphite
+      app.kubernetes.io/metrics-by: prometheus
+      app: spark
     serviceAccount: spark
-    javaOptions: "-Dapp.name=spark-pi-graphite"
     volumeMounts:
       - name: "nfs-volume"
         mountPath: "/mnt/nfs_share"
@@ -70,17 +79,19 @@ spec:
         mountPath: "/opt/spark/metrics"
       - name: "spark-volume"
         mountPath: "/mnt/spark-apps"
+    javaOptions: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dapp.name=spark-pi-graphite -Divy.cache.dir=/tmp -Divy.home=/tmp"
   executor:
     cores: 1
-    instances: 2
+    coreLimit: "1000m"
+    instances: 1
     memory: "512m"
     labels:
       app.kubernetes.io/version: 3.1.2
       app.kubernetes.io/component: spark-executor
       app.kubernetes.io/part-of: spark
       app.kubernetes.io/managed-by: self
-      app.kubernetes.io/metrics-by: graphite
-    javaOptions: "-Dapp.name=spark-pi-graphite"
+      app.kubernetes.io/metrics-by: prometheus
+      app: spark
     volumeMounts:
       - name: "nfs-volume"
         mountPath: "/mnt/nfs_share"
@@ -88,3 +99,5 @@ spec:
         mountPath: "/opt/spark/metrics"
       - name: "spark-volume"
         mountPath: "/mnt/spark-apps"
+    javaOptions: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dapp.name=spark-pi-graphite -Divy.cache.dir=/tmp -Divy.home=/tmp"
+

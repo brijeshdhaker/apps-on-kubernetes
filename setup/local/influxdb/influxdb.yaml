@@ -1,5 +1,9 @@
 #
+# kubectl -n influxdb apply -f setup/local/influxdb/influxdb.yaml
 #
+# kubectl -n influxdb delete -f setup/local/influxdb/influxdb.yaml
+#
+# kubectl -n influxdb exec -it  influx -- /bin/bash
 #
 ---
 apiVersion: apps/v1
