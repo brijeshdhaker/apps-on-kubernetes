@@ -11,16 +11,21 @@ az aks get-credentials --resource-group dhakerb-aks-rg --name dhakerb-aks-cluste
 #
 
 export REPO_NAME=docker.io
-
 cd $SPARK_HOME
 
-docker build -t brijeshdhaker/spark:3.1.2-k8s -f ./kubernetes/dockerfiles/spark/Dockerfile .
-docker push brijeshdhaker/spark:3.1.2-k8s
+#
+#
+#
+docker build -t brijeshdhaker/spark:3.1.2 -f kubernetes/dockerfiles/spark/Dockerfile .
+docker push brijeshdhaker/spark:3.1.2
 
-./bin/docker-image-tool.sh -t 3.1.2 -p ./kubernetes/dockerfiles/spark/bindings/python/Dockerfile build
+
+#
+$ ./bin/docker-image-tool.sh -r docker.io/brijeshdhaker -t 3.1.2 -p kubernetes/dockerfiles/spark/Dockerfile build
 
 # To build additional PySpark docker image
 $ ./bin/docker-image-tool.sh -r <repo> -t my-tag -p ./kubernetes/dockerfiles/spark/bindings/python/Dockerfile build
+
 
 # To build additional SparkR docker image
 $ ./bin/docker-image-tool.sh -r <repo> -t my-tag -R ./kubernetes/dockerfiles/spark/bindings/R/Dockerfile build
@@ -63,6 +68,59 @@ $SPARK_HOME/bin/spark-submit \
 --conf "spark.driver.extraJavaOptions=-Divy.cache.dir=/tmp -Divy.home=/tmp" \
 local:///opt/spark/examples/jars/spark-examples_2.12-3.1.2.jar  10000
 
+
+#
+#
+#
+$SPARK_HOME/bin/spark-submit \
+--master k8s://https://192.168.122.95:6443 \
+--deploy-mode cluster \
+--name spark-pi \
+--class org.apache.spark.examples.SparkPi \
+--conf spark.kubernetes.driver.pod.name=spark-pi \
+--conf spark.executor.instances=2 \
+--conf spark.kubernetes.container.image=docker.io/brijeshdhaker/spark:3.1.2 \
+--conf "spark.kubernetes.namespace=default" \
+--conf "spark.kubernetes.authenticate.serviceAccountName=spark" \
+--conf "spark.kubernetes.authenticate.driver.serviceAccountName=spark" \
+--conf "spark.ui.prometheus.enabled=true" \
+--conf "spark.executor.processTreeMetrics.enabled=true" \
+--conf "spark.kubernetes.driver.annotation.prometheus.io/scrape=true" \
+--conf "spark.kubernetes.driver.annotation.prometheus.io/port=4040" \
+--conf "spark.kubernetes.driver.annotation.prometheus.io/path=/metrics/prometheus/" \
+--conf "spark.kubernetes.driver.service.annotation.prometheus.io/scrape=true" \
+--conf "spark.kubernetes.driver.service.annotation.prometheus.io/port=4040" \
+--conf "spark.kubernetes.driver.service.annotation.prometheus.io/path=/metrics/executors/prometheus/" \
+--conf "spark.driver.extraJavaOptions=-Divy.cache.dir=/tmp -Divy.home=/tmp" \
+local:///opt/spark/examples/jars/spark-examples_2.12-3.1.2.jar  100000
+
+
+$SPARK_HOME/bin/spark-submit \
+--master k8s://https://192.168.122.95:6443 \
+--deploy-mode cluster \
+--name spark-pi \
+--class org.apache.spark.examples.SparkPi \
+--conf spark.executor.instances=2 \
+--conf spark.kubernetes.driver.pod.name=spark-pi \
+--conf spark.kubernetes.container.image=docker.io/brijeshdhaker/spark:3.1.2 \
+--conf "spark.kubernetes.namespace=default" \
+--conf "spark.kubernetes.authenticate.serviceAccountName=spark" \
+--conf "spark.kubernetes.authenticate.driver.serviceAccountName=spark" \
+--conf "spark.ui.prometheus.enabled=true" \
+--conf "spark.kubernetes.driver.annotation.prometheus.io/scrape=true"  \
+--conf "spark.kubernetes.driver.annotation.prometheus.io/port=4040"  \
+--conf "spark.kubernetes.driver.annotation.prometheus.io/path=/metrics/prometheus/"  \
+--conf "spark.kubernetes.driver.service.annotation.prometheus.io/scrape=true" \
+--conf "spark.kubernetes.driver.service.annotation.prometheus.io/port=4040" \
+--conf "spark.kubernetes.driver.service.annotation.prometheus.io/path=/metrics/executors/prometheus/" \
+--conf "spark.driver.extraJavaOptions=-Divy.cache.dir=/tmp -Divy.home=/tmp" \
+local:///opt/spark/examples/jars/spark-examples_2.12-3.1.2.jar  100000
+
+kubectl delete pod -l spark-role=driver
+
+kubectl port-forward svc/spark-pi-c3677785fd86054f-driver-svc 5040:4040
+
+http://localhost:5040/metrics/executors/prometheus/
 
 #
 ## With NFS Volume
@@ -188,3 +246,17 @@ echo "Enter Some text to encode"
 read text
 etext=`echo -n $text | base64`
 echo "Encoded text is : $etext"
+
+
+#
+# Master
+#
+http://localhost:8080/metrics/master/prometheus/
+# Worker
+http://localhost:8081/metrics/prometheus/
+
+# Driver 
+http://localhost:4040/metrics/prometheus/
+
+# Executor
+http://localhost:4040/metrics/executors/prometheus

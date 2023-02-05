@@ -1,0 +1,28 @@
+#
+# kubectl apply -f admin/user/brijeshdhaker-rbac.yaml
+#
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: engineering-cluster-roles
+rules:
+  - apiGroups: ["*"]         # "*" indicates as a suffix glob match
+    resources: [""]
+    verbs: [ "" ]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: brijesdhaker-rbac
+  namespace: engineering
+roleRef:
+  kind: Role                              # This must be Role or ClusterRole
+  name: engineering-roles                 # This must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: User
+    name: brijesdhaker                    # Name of the User
+    namespace: engineering

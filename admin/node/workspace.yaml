@@ -1,0 +1,23 @@
+#
+# kubectl -n sys-admin apply -f admin/node/workspace.yaml
+# kubectl -n sys-admin delete -f admin/node/workspace.yaml
+# kubectl run -i --tty --rm workspace --image=radial/busyboxplus:curl --serviceaccount=node-admin
+# kubectl -n sys-admin exec -it workspace -- /bin/sh
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: workspace
+spec:
+  serviceAccountName: node-admin
+  containers:
+    - name: busybox
+      image: radial/busyboxplus:curl
+      command:
+        - 'sleep'
+        - '10000000'
+      env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName

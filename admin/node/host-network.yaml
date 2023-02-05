@@ -1,0 +1,15 @@
+#
+# kubectl -n sys-admin apply -f admin/node/host-network.yaml
+# kubectl -n sys-admin delete -f admin/node/host-network.yaml
+# kubectl run -i --tty --rm workspace --image=radial/busyboxplus:curl --serviceaccount=node-admin
+# kubectl -n sys-admin exec -it nginx -- /bin/sh
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  hostNetwork: true
+  containers:
+    - name: nginx
+      image: nginx
