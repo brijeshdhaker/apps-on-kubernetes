@@ -1,0 +1,50 @@
+#
+# X509 Client Certs
+# /O=system:nodes/O=system:node:k8c1m0/O=system:node:k8c1s1/O=system:node:k8c1s2
+
+1. Create a private key file
+   openssl genrsa -out admin/cluster-admin/cluster-admin-user.key 2048
+
+2. Generate Singing Request
+   openssl req -new -key admin/cluster-admin/cluster-admin-user.key -out admin/cluster-admin/cluster-admin-user.pem -subj "/CN=cluster-admin-user"
+
+   This would create a CSR for the username "cluster-admin-user"
+
+3. Encode CSR into base64 string
+   cat admin/cluster-admin/cluster-admin-user.pem | base64 | tr -d '\n'
+   LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQ1lqQ0NBVW9DQVFBd0hURWJNQmtHQTFVRUF3d1NZMngxYzNSbGNpMWhaRzFwYmkxMWMyVnlNSUlCSWpBTgpCZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF0MjVkeXIvWHpqWFFUNG1zQ1NPVnRlRi9MZEZXCmkyNDFtM3BUMHc3OU1sQjFMVmx1WHRIL2F3NDRSODNCU05PV0tEV1NUYVlNbWIxY1JTMUEzR3hjazRMc0d5N3oKL2M1dXRuQzdleFNsemhhYXBPcDF6dHJiQlIrSExScVhEVnc1dDBVaUlpVEgrd2V4UXdjZlNuc1dheWRSUTZndAppRFNITEcxV0trYXNJYjBhNnFKZEg1Qnp6c2xRZTNZT1JPZlNpM3hSRE5IVlBFbUJYZVR2YVNNZFVyY093dmNECnBiTUM3bnRDRkE0aERyV0FXdUIwenN5MFkyeklpdTYzcDJOL05UV3FZU1lEeWNBV3RIR3ZZU1BmMDhuSjdqVjYKcWdyNFlhR2d3S1hPc2JjRC9KNU0wcFZvclgxY1FOVVUwRDJ5Y1pwVDdtdGl5emI3TVpJUEw3VVUrd0lEQVFBQgpvQUF3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUZOUldnYXh2QXEwaWNwcUV1Q0pjZkR2SjZPRWo3Y2dYUlZSCnRKdWpBeG9WbnI5dW0rTkd0dXg2RjNneVRaQzVMVkYvYmQ2a1dUaTU0NUR3NW1yRE95ZkVwYUQ0Z094L2ZUZm8KQmxoOHIyVllQZ2lGRmxVRlV6bjZ2R3NsZ1V4ZXpDM09SaGNKOEVDUlNMa1gwcjZZTlg3SG1wY24yejBjREZsUgorZFc1VHRRNUxCcXFONTAxNnl5Z2F2Nkd1UGRtNkliNVdJanpIS1lWbjZvcWw3SWJlZ2s1dTZyY3VVQTN5UldVCmlBYlRwSFdacFJEdFVWWWorcGhnU0svVVlkcXVtSmN2V3NkY1FzTHN3cGFvSHJ4NmlaSEU0MTgwaUMvb01XUUUKdDlSKytqdHFrcGd5SUlZM0xOSTI5eXlzRTFJVm1kK0FVRENXYlZtZk5BSkJINlhzZXB3PQotLS0tLUVORCBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0K
+
+4. Update & Submit CSR Request
+   kubectl apply -f admin/cluster-admin/cluster-admin-user-csr.yaml
+
+5. Admin will approve CSR
+   kubectl certificate approve cluster-admin-user-csr
+
+6. kubectl get csr cluster-admin-user-csr -o json
+   LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURFakNDQWZxZ0F3SUJBZ0lRWmNpNGdoayt2cFVGd2VvMnpTRTZ6VEFOQmdrcWhraUc5dzBCQVFzRkFEQVYKTVJNd0VRWURWUVFERXdwcmRXSmxjbTVsZEdWek1CNFhEVEl6TURJd05URTNNamd5TTFvWERUSXpNRFV4TmpFMwpNamd5TTFvd0hURWJNQmtHQTFVRUF4TVNZMngxYzNSbGNpMWhaRzFwYmkxMWMyVnlNSUlCSWpBTkJna3Foa2lHCjl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF0MjVkeXIvWHpqWFFUNG1zQ1NPVnRlRi9MZEZXaTI0MW0zcFQKMHc3OU1sQjFMVmx1WHRIL2F3NDRSODNCU05PV0tEV1NUYVlNbWIxY1JTMUEzR3hjazRMc0d5N3ovYzV1dG5DNwpleFNsemhhYXBPcDF6dHJiQlIrSExScVhEVnc1dDBVaUlpVEgrd2V4UXdjZlNuc1dheWRSUTZndGlEU0hMRzFXCktrYXNJYjBhNnFKZEg1Qnp6c2xRZTNZT1JPZlNpM3hSRE5IVlBFbUJYZVR2YVNNZFVyY093dmNEcGJNQzdudEMKRkE0aERyV0FXdUIwenN5MFkyeklpdTYzcDJOL05UV3FZU1lEeWNBV3RIR3ZZU1BmMDhuSjdqVjZxZ3I0WWFHZwp3S1hPc2JjRC9KNU0wcFZvclgxY1FOVVUwRDJ5Y1pwVDdtdGl5emI3TVpJUEw3VVUrd0lEQVFBQm8xWXdWREFPCkJnTlZIUThCQWY4RUJBTUNCYUF3RXdZRFZSMGxCQXd3Q2dZSUt3WUJCUVVIQXdJd0RBWURWUjBUQVFIL0JBSXcKQURBZkJnTlZIU01FR0RBV2dCUlRuQ2dzMFkyNlJrSzhFeXdJd1NJTGVEK3ZTREFOQmdrcWhraUc5dzBCQVFzRgpBQU9DQVFFQTAybTFMNmNraVJOUmtPRGc5bm9GSWpXc1hWSVZoWjVVL2xkdHIwWmZvNmQ5ZWR2Q0U5aUd3Z3RICnlIQmQ4R1FaRzFnMmlqNkRWZ2FocW9IYlVTSEx6WTNQbTF5YVowbHRoUUhYR25waW4rOTVGU1ZhQzV4dGNtRHEKd1hDdisrWE1SRW8wQTJYei9POTNSd1pqbEd1elBvTWpFY25naTNSMDUyc0luRDhZNU5PNmY0NnJsb3ZmUlhHNApXMGZIdnRiOERCdUxPaG1wSVZYMXZvRExtRVBibWJ6Y0EzQXFRS0lQUkNuakR6UURWVDRJaC9aOHdXNlFWVlZpCjB5ZlpmdWRMUjdtemZsOTBuYnBEdWNocmExUlRjVERnNDJSQVp5WWs2R2ljZDZYYzllbkUzRkRBT25nUzNjcHcKb1pQYkk5MXFLK1lOVkZqM2dodzhLVFdyUTJvaWdRPT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+
+7. kubectl get csr cluster-admin-user-csr -o jsonpath={.status.certificate} | base64 --decode > admin/cluster-admin/cluster-admin-user.crt
+
+
+#
+## Assign Cluster Admin Role
+#
+kubectl apply -f admin/cluster-admin/cluster-admin-user-rbac.yaml
+
+#
+# Validate API Server Access 
+#
+
+kubectl auth can-i list pods --namespace kube-system --as cluster-admin-user
+
+
+curl -GET --cacert admin/cluster-admin/ca.crt --key admin/cluster-admin/cluster-admin-user.key --cert admin/cluster-admin/cluster-admin-user.crt https://k8c1m0:6443/api/v1/namespaces
+
+curl -GET --cacert admin/cluster-admin/ca.crt --key admin/cluster-admin/cluster-admin-user.key --cert admin/cluster-admin/cluster-admin-user.crt https://k8c1m0:6443/api/v1/nodes
+
+curl -GET --cacert admin/cluster-admin/ca.crt --key admin/cluster-admin/cluster-admin-user.key --cert admin/cluster-admin/cluster-admin-user.crt https://k8c1m0:6443/metrics
+
+#
+# Access from POD
+#
+curl --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" https://kubernetes.default.svc/metrics
