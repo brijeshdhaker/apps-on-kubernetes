@@ -1,0 +1,25 @@
+#
+# X509 Client Certs
+#
+
+1. Create a private key file
+   openssl genrsa -out nodeadmin.key 2048
+
+2. Generate Singing Request
+   openssl req -new -key kubeletuser.key -out brijeshdhaker-csr.pem -days 3650 -subj "/CN=brijeshdhaker/O=system:masters"
+
+   This would create a CSR for the username "brijeshdhaker", belonging to two groups, "Engineering" and "Admin".
+
+3. Encode CSR into base64 string
+   cat brijeshdhaker-csr.pem | base64 | tr -d '\n'
+   LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQ2d6Q0NBV3NDQVFBd1BqRVdNQlFHQTFVRUF3d05ZbkpwYW1WemFHUm9ZV3RsY2pFVU1CSUdBMVVFQ2d3TApaVzVuYVc1bFpYSnBibWN4RGpBTUJnTlZCQW9NQldGa2JXbHVNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DCkFROEFNSUlCQ2dLQ0FRRUExazVSZDRWWHRWUittdkc2MGczQUxSc2EvcnBQVE9Pazk0Z0d3Um9kdU5jcStmbjEKUEN4RDVTa3FIaHlhbWhTeUowL1pQaDB4REtBeld1dVVwQk9Wa2R3N0d2Mk1iVTYybTZVajl4VkZZeUt3YXVIQwpBcTQ3eTY5ZllkeUNwemZZbWhUSHhwYlo3cDBJUjM1Q2I4NDcydmJ6RGhQQ09rRjM0bERkOUhDdU1sWnV5UXF1CmhudXpXbWFodkxXM2xEb0pSNnRMbUpnZHVrT3h3K0VZTWtETHptT01JZEpIeFh2eWFpYmhDQXRvNm1JVmlJdjcKU3lIOXp1MUJFLzBZcms4a0ZoeDZoM043aVdLMzVZY3dFTHNMRG16NkF4RGF0TmFpcVBYV0lLd0RqTG4vMGphYgorVVVxUXF1d1ZzdDMwcEhtRHRhNjV6MkxNbkVGWlhQQVQ3cS9Xd0lEQVFBQm9BQXdEUVlKS29aSWh2Y05BUUVMCkJRQURnZ0VCQUcwVm1KcU9XQU1lTTRSMjVPMy9tcXhwTXVaMVNIdnpxc0U1SnZOT0I0aldwME9WcXBhTmN1Z20Kc3VqdXh5UCtsUkoybEdwZTVoU09yOExoQ09UTlFnR2lhbEFaMTNJcFY0OXQyRjRYZ0RiQW5wYnhpMUl3REU0VwpRbWVlTXBxMlNoaTlFaW9wQzM3RTdrek1Md0d2eGpKQjBSdSt2Z0kreWRQdUwrWFd3QTFSUjZiUHBsNHJxdmNiCkx1UG9VaHBPMDBYSjV1Y0dDazBraHVndjZ2QzZQeTNCclIwblg2SWU2NU1NSUY1UEtLN1dvdkw5b3k2elg2RVcKN0V1VE9ROStCOHhKYWo4R014Snc2dmNvd2pXNk0xUFpZMW0vODNwUW51dlRJRnRudEcwbEVwWjc4RUVtVk1idwpOTVZoaittVzRCNGRkZVpkNXV4NTlVTmRQdjFpdVlRPQotLS0tLUVORCBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0K
+
+4. Submit CSR Request
+   kubectl apply -f setup/admin/user-csr.yaml
+
+5. Admin will approve CSR
+   kubectl certificate approve brijeshdhaker-csr
+
+6. kubectl get csr brijeshdhaker-csr -o json
+
+7. kubectl get csr brijeshdhaker-csr -o jsonpath={.status.certificate} | base64 --decode > brijeshdhaker.crt

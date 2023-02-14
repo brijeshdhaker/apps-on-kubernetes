@@ -1,0 +1,31 @@
+#
+# kubectl -n monitoring apply -f setup/local/monitoring/sm-graphite-exporter.yaml
+#
+# kubectl -n monitoring delete -f setup/local/monitoring/sm-graphite-exporter.yaml
+#
+#
+# kubectl port-forward svc/spark-pi-90889185fcba4750-driver-svc 4040:4040
+#
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/name: sm-spark-prometheus
+    app.kubernetes.io/component: spark-monitering
+    release:  prometheus
+  name: sm-graphite-exporter
+  namespace: monitoring
+spec:
+  endpoints:
+    - port: graphite-exporter-metrics
+      interval: 10s
+      path: '/metrics'
+  namespaceSelector:
+    matchNames:
+      - graphite
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: graphite-exporter
+
+---

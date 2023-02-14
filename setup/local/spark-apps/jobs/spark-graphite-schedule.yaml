@@ -34,6 +34,8 @@ spec:
       excludePackages: []
       repositories: []
     sparkConf:
+      spark.eventLog.enabled: 'true'
+      spark.eventLog.dir: 'file:///mnt/nfs_share/spark-logs/'
       spark.metrics.conf: "/opt/spark/metrics/metrics.properties"
       spark.metrics.staticSources.enabled: "true"
       spark.metrics.appStatusSource.enabled: "true"
@@ -85,7 +87,7 @@ spec:
           mountPath: "/opt/spark/metrics"
         - name: "spark-volume"
           mountPath: "/mnt/spark-apps"
-      javaOptions: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dapp.name=spark-pi-graphite-schedule -Divy.cache.dir=/tmp -Divy.home=/tmp"
+      javaOptions: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Divy.cache.dir=/tmp -Divy.home=/tmp"
     executor:
       cores: 1
       coreLimit: "1000m"
@@ -105,4 +107,4 @@ spec:
           mountPath: "/opt/spark/metrics"
         - name: "spark-volume"
           mountPath: "/mnt/spark-apps"
-      javaOptions: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dapp.name=spark-pi-graphite-schedule -Divy.cache.dir=/tmp -Divy.home=/tmp"
+      javaOptions: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Divy.cache.dir=/tmp -Divy.home=/tmp"

@@ -39,7 +39,7 @@ export CACERT=/etc/kubernetes/pki/ca.crt
 export TOKEN=`cat /var/run/secrets/kubernetes.io/serviceaccount/token`
 export API_SERVER=$(kubectl config view | grep server | cut -f 2- -d ":" | tr -d " ")
 export NODE_NAME=k8c1m0
-curl -k -v -GET --cacert ${CACERT} --header "Authorization: Bearer $TOKEN"  ${APIHOST}/api/v1/nodes/$NODE_NAME/proxy/containerLogs/kube-system/coredns-1234567890-abcde/coredns
+curl -k -v -GET --cacert ${CACERT} --header "Authorization: Bearer $TOKEN"  ${API_SERVER}/api/v1/nodes/$NODE_NAME/proxy/containerLogs/kube-system/coredns-1234567890-abcde/coredns
 
 #
 # kubelet : get secure metrics & logs 
@@ -158,7 +158,7 @@ kube-apiserver \
    openssl genrsa -out brijeshdhaker.key 2048
 
 2. Generate Singing Request
-   openssl req -new -key brijeshdhaker.key -out brijeshdhaker-csr.pem -days 3650 -subj "/CN=brijeshdhaker/O=system:masters/O=system:nodes"
+   openssl req -new -key brijeshdhaker.key -out brijeshdhaker-csr.pem -subj "/CN=brijeshdhaker/O=system:masters/O=system:nodes"
 
    This would create a CSR for the username "brijeshdhaker", belonging to two groups, "Engineering" and "Admin".
 

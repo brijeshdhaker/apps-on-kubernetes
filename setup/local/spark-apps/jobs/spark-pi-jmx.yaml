@@ -1,7 +1,7 @@
 #
-# kubectl -n spark-apps apply -f setup/local/spark-apps/jobs/spark-jmx.yaml
+# kubectl -n spark-apps apply -f setup/local/spark-apps/jobs/spark-pi-jmx.yaml
 #
-# kubectl -n spark-apps delete -f setup/local/spark-apps/jobs/spark-jmx.yaml
+# kubectl -n spark-apps delete -f setup/local/spark-apps/jobs/spark-pi-jmx.yaml
 #
 # kubectl -n spark-apps get sparkapplications spark-jmx -o=yaml
 #
@@ -10,7 +10,7 @@
 # kubectl -n spark-apps describe sparkapplication spark-jmx
 #
 
-apiVersion: "sparkoperator.k8s.io/v1beta2"
+apiVersion: 'sparkoperator.k8s.io/v1beta2'
 kind: SparkApplication
 metadata:
   name: spark-jmx
@@ -18,19 +18,44 @@ metadata:
 spec:
   type: Scala
   mode: cluster
-  image: "gcr.io/spark-operator/spark:v3.0.0-gcs-prometheus"
+  image: 'gcr.io/spark-operator/spark:v3.0.0-gcs-prometheus'
   imagePullPolicy: Always
   mainClass: org.apache.spark.examples.SparkPi
-  mainApplicationFile: "local:///opt/spark/examples/jars/spark-examples_2.12-3.0.0.jar"
+  mainApplicationFile: 'local:///opt/spark/examples/jars/spark-examples_2.12-3.0.0.jar'
   arguments:
-    - "100000"
-  sparkVersion: "3.0.0"
+    - '100000'
+  sparkConf:
+    spark.eventLog.enabled: 'true'
+    spark.eventLog.dir: 'file:///mnt/nfs_share/spark-logs/'
+    spark.metrics.conf: '/opt/spark/metrics/metrics.properties'
+    spark.metrics.staticSources.enabled: 'true'
+    spark.metrics.appStatusSource.enabled: 'true'
+    spark.executor.processTreeMetrics.enabled: 'true'
+  sparkVersion: '3.0.0'
   restartPolicy:
     type: Never
+  volumes:
+    - name: 'nfs-volume'
+      nfs:
+        path: '/mnt/nfs_share'
+        server: '192.168.122.1'
+    - name: 'host-volume'
+      hostPath:
+        path: '/mnt/local-share'
+        type: Directory
+    - name: 'spark-volume'
+      persistentVolumeClaim:
+        claimName: 'spark-volume'
+    - name: 'configmap-volume'
+      configMap:
+        name: 'spark-apps-configmap'
+        items:
+          - key: 'prometheus.metrics.properties'
+            path: 'metrics.properties'
   driver:
     cores: 1
-    coreLimit: "1200m"
-    memory: "512m"
+    coreLimit: '1200m'
+    memory: '640m'
     labels:
       app.kubernetes.io/version: 3.0.0
       app.kubernetes.io/component: spark-driver
@@ -38,19 +63,41 @@ spec:
       app.kubernetes.io/managed-by: self
       app.kubernetes.io/metrics-by: jmx
     serviceAccount: spark
+    volumeMounts:
+      - name: "nfs-volume"
+        mountPath: "/mnt/nfs_share"
+      - name: "configmap-volume"
+        mountPath: "/opt/spark/metrics"
+      - name: "spark-volume"
+        mountPath: "/mnt/spark-apps"
+    javaOptions: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Divy.cache.dir=/tmp -Divy.home=/tmp"
+#
+#
   executor:
     cores: 1
-    instances: 2
-    memory: "512m"
+    instances: 1
+    memory: '640m'
     labels:
       app.kubernetes.io/version: 3.0.0
       app.kubernetes.io/component: spark-executor
       app.kubernetes.io/part-of: spark
       app.kubernetes.io/managed-by: self
       app.kubernetes.io/metrics-by: jmx
+    volumeMounts:
+      - name: "nfs-volume"
+        mountPath: "/mnt/nfs_share"
+      - name: "configmap-volume"
+        mountPath: "/opt/spark/metrics"
+      - name: "spark-volume"
+        mountPath: "/mnt/spark-apps"
+    javaOptions: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Divy.cache.dir=/tmp -Divy.home=/tmp"
+#
+#
   monitoring:
     exposeDriverMetrics: true
     exposeExecutorMetrics: true
+#    metricsProperties:
     prometheus:
-      jmxExporterJar: "/prometheus/jmx_prometheus_javaagent-0.11.0.jar"
+      jmxExporterJar: '/prometheus/jmx_prometheus_javaagent-0.11.0.jar'
       port: 8090
+      portName: jmx-metrics

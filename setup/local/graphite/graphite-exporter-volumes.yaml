@@ -1,24 +1,24 @@
 #
-# kubectl -n spark-apps apply -f setup/local/spark-apps/spark-apps-volumes.yaml
+# kubectl -n graphite apply -f setup/local/graphite/graphite-exporter-volumes.yaml
 #
-# kubectl -n spark-apps delete -f setup/local/spark-apps/spark-apps-volumes.yaml
+# kubectl -n graphite delete -f setup/local/graphite/graphite-exporter-volumes.yaml
 #
 ---
 
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: spark-volume
+  name: graphite-data
 spec:
   capacity:
-    storage: 2Gi
+    storage: 20Gi
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   mountOptions:
     - nfsvers=4.2
   nfs:
-    path: /mnt/nfs_share/spark-apps
+    path: /mnt/nfs_share/graphite/data
     server: 192.168.122.1
     readOnly: false
 
@@ -27,34 +27,33 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: spark-volume
+  name: graphite-data
   labels:
-    vol: spark-volume
+    vol: graphite-data
 spec:
   storageClassName: ""
-  volumeName: "spark-volume"
+  volumeName: "graphite-data"
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: 2Gi
+      storage: 20Gi
 
 ---
-
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: spark-logs
+  name: graphite-configs
 spec:
   capacity:
-    storage: 2Gi
+    storage: 20Gi
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   mountOptions:
     - nfsvers=4.2
   nfs:
-    path: '/mnt/nfs_share/spark-logs'
+    path: /mnt/nfs_share/graphite/configs
     server: 192.168.122.1
     readOnly: false
 
@@ -63,16 +62,16 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: spark-logs
+  name: graphite-configs
   labels:
-    vol: spark-logs
+    vol: graphite-configs
 spec:
   storageClassName: ""
-  volumeName: 'spark-logs'
+  volumeName: "graphite-configs"
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: 2Gi
+      storage: 20Gi
 
 ---

@@ -1,0 +1,25 @@
+#
+# X509 Client Certs
+# /O=system:nodes/O=system:node:k8c1m0/O=system:node:k8c1s1/O=system:node:k8c1s2
+
+1. Create a private key file
+   openssl genrsa -out admin/node/node-admin-user.key 2048
+
+2. Generate Singing Request
+   openssl req -new -key admin/node/node-admin-user.key -out admin/node/node-admin-user.pem -subj "/CN=system:node:k8c1s2/O=cluster-admin"
+
+   This would create a CSR for the username "node-admin-user", belonging to two groups, "system:masters" and "system:nodes".
+
+3. Encode CSR into base64 string
+   cat admin/node/node-admin-user.pem | base64 | tr -d '\n'
+   LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQzV6Q0NBYzhDQVFBd2dhRXhHREFXQmdOVkJBTU1EMjV2WkdVdFlXUnRhVzR0ZFhObGNqRVhNQlVHQTFVRQpDZ3dPYzNsemRHVnRPbTFoYzNSbGNuTXhGVEFUQmdOVkJBb01ESE41YzNSbGJUcHViMlJsY3pFYk1Ca0dBMVVFCkNnd1NjM2x6ZEdWdE9tNXZaR1U2YXpoak1XMHdNUnN3R1FZRFZRUUtEQkp6ZVhOMFpXMDZibTlrWlRwck9HTXgKY3pFeEd6QVpCZ05WQkFvTUVuTjVjM1JsYlRwdWIyUmxPbXM0WXpGek1qQ0NBU0l3RFFZSktvWklodmNOQVFFQgpCUUFEZ2dFUEFEQ0NBUW9DZ2dFQkFLanp4dG9lUHNOSllyd1grcTJmNFJENVh6ZWRkVUwySVJITWk1SVV3V2VsCjdmNFc3UGhYVnVSWTlCRWFFMEM5V0lXK1RvREFKYzB6ZnpLK09TSk0vSUFuOE84VEtMZXVYTHdoalF6cmlqcGoKUThPYURmZ0hIcjFDK1VuZkIza0VjSlFQMGtkYWY4dDdkc3hjWllrbE54aHRGVlVLRjhKYnJTU2JXWFRWLzBtTApUOE1pN3c2Qm1QUmJ5WVh4Mm1VZmNNUVJvaTN6QVVnRVZRQVJKQWdTTlkxRnk3anFXL1l5MkpKNDh5aTVVcGJQCkNtK2lBU0ZKdFlHRnQyNHdKcG1Hci9TV21sYlU5dVFXdUlibENJUzhOU29NWWVJdDNiY0ViTjNvSjNzMnh0bXgKTEdkMldEMHZqeklFK2xXbnk5VHh1UTd6LzFTN1lBU2JUTGFQYTFpN3RqOENBd0VBQWFBQU1BMEdDU3FHU0liMwpEUUVCQ3dVQUE0SUJBUUNZL293Z05rV2RXVWhWYWZpYmZKelhVYkQ4V05KcHFsVWh1d0RxbXg4RUd1MURWT2t3CloxV2k2MDBVeWlNenVYL0xyQ0c2UnFndVFnY3BoMVdIY1dmWElNT1grWGdKSExxUEp5Wnc2clFjNzdVVDBuKysKZUZlanF3Zk1yb3pNNStRSWZhUFJzTzFOY1dEanpCUjNaTkw1bjdpdlA0K2s3NFc5blE1R1VMQUtKbUlENkhQbAozdVZoMVJWeXlEVWNqUDQySkl3MktkKzlkWWFOMGpFOU5vSWI3M3BOMDUzSGQvdGVWcC83U0RWY0xqSWQ0N0JuCjltRUx0elVKTlFhanFxWlU3V3A3MDd1aHNDNk92WGJUZEJ4aUp4YlF0UDAzY21JaUhHOHc2WWhURGMwRDZ1L3cKUlhwUHZ3OEVkV014MHNDTHhjZWRXZndweHpLUmd5M0phTEJZCi0tLS0tRU5EIENFUlRJRklDQVRFIFJFUVVFU1QtLS0tLQo=
+
+4. Submit CSR Request
+   kubectl apply -f admin/node/node-admin-user-csr.yaml
+
+5. Admin will approve CSR
+   kubectl certificate approve node-admin-user-csr
+
+6. kubectl get csr brijeshdhaker-csr -o json
+
+7. kubectl get csr brijeshdhaker-csr -o jsonpath={.status.certificate} | base64 --decode > brijeshdhaker.crt

@@ -26,6 +26,8 @@ spec:
     packages:
       - "ch.cern.sparkmeasure:spark-measure_2.12:0.22"
   sparkConf:
+    spark.eventLog.enabled: 'true'
+    spark.eventLog.dir: 'file:///mnt/nfs_share/spark-logs/'
     spark.metrics.conf: "/opt/spark/metrics/metrics.properties"
     spark.metrics.staticSources.enabled: "true"
     spark.metrics.appStatusSource.enabled: "true"
