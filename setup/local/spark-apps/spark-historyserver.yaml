@@ -1,7 +1,8 @@
 #
 # kubectl -n spark-apps apply -f setup/local/spark-apps/spark-historyserver.yaml
 #
-
+# kubectl -n spark-apps delete -f setup/local/spark-apps/spark-historyserver.yaml
+#
 # Create a service for a pod valid-pod, which serves on port 444 with the name "frontend"
 # kubectl -n spark-apps expose pod spark-historyserver --port=18080 --name=spark-historyserver --type=LoadBalancer
 # kubectl -n spark-apps exec -it spark-historyserver -- 'ls -lart /mnt/nfs_share/spark/history-server/logs'
