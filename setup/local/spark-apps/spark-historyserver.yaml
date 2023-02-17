@@ -19,12 +19,14 @@ spec:
     fsGroup: 0
     fsGroupChangePolicy: "OnRootMismatch"
   containers:
-    - image: docker.io/brijeshdhaker/spark-historyserver:3.1.2-k8s
+    - image: docker.io/brijeshdhaker/spark:3.1.2-standalone
       name: historyserver
       imagePullPolicy: Always
       env:
-        - name: WORKLOAD
+        - name: SPARK_WORKLOAD
           value: 'HistoryServer'
+        - name: SPARK_HISTORY_CONF_FILE
+          value: '/opt/spark/conf/spark-defaults.conf'
       ports:
         - containerPort: 18080
           name: "historyserver"
