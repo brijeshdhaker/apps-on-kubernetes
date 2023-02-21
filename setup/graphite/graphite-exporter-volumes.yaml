@@ -1,0 +1,77 @@
+#
+# kubectl -n graphite apply -f setup/graphite/graphite-exporter-volumes.yaml
+#
+# kubectl -n graphite delete -f setup/graphite/graphite-exporter-volumes.yaml
+#
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: graphite-data
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=4.2
+  nfs:
+    path: /mnt/nfs_share/graphite/data
+    server: 192.168.122.1
+    readOnly: false
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: graphite-data
+  labels:
+    vol: graphite-data
+spec:
+  storageClassName: ""
+  volumeName: "graphite-data"
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: graphite-configs
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=4.2
+  nfs:
+    path: /mnt/nfs_share/graphite/configs
+    server: 192.168.122.1
+    readOnly: false
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: graphite-configs
+  labels:
+    vol: graphite-configs
+spec:
+  storageClassName: ""
+  volumeName: "graphite-configs"
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+
+---

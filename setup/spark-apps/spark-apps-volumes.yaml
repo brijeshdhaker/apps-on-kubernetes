@@ -1,0 +1,78 @@
+#
+# kubectl -n spark-apps apply -f setup/spark-apps/spark-apps-volumes.yaml
+#
+# kubectl -n spark-apps delete -f setup/spark-apps/spark-apps-volumes.yaml
+#
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: spark-volume
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=4.2
+  nfs:
+    path: /mnt/nfs_share/spark-apps
+    server: 192.168.122.1
+    readOnly: false
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: spark-volume
+  labels:
+    vol: spark-volume
+spec:
+  storageClassName: ""
+  volumeName: "spark-volume"
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: spark-logs
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=4.2
+  nfs:
+    path: '/mnt/nfs_share/spark-logs'
+    server: 192.168.122.1
+    readOnly: false
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: spark-logs
+  labels:
+    vol: spark-logs
+spec:
+  storageClassName: ""
+  volumeName: 'spark-logs'
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+
+---

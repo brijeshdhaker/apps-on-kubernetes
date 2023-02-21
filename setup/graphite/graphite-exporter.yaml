@@ -1,0 +1,66 @@
+#
+# kubectl -n graphite apply -f setup/graphite/graphite-exporter.yaml
+#
+# kubectl -n graphite delete -f setup/graphite/graphite-exporter.yaml
+#
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: graphite-exporter
+    app.kubernetes.io/name: graphite-exporter
+    app.kubernetes.io/version: 1.8.10
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: graphite-4.12.0
+  name: graphite-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: graphite-exporter
+      app.kubernetes.io/name: graphite-exporter
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: graphite-exporter
+        app.kubernetes.io/name: graphite-exporter
+    spec:
+      containers:
+      - image: docker.io/prom/graphite-exporter:latest
+        imagePullPolicy: IfNotPresent
+        name: graphite-exporter
+        args:
+          - --graphite.mapping-config=/configs/graphite_mapping.yaml
+        ports:
+          - containerPort: 9108
+            name: api
+            protocol: TCP
+          - containerPort: 9109
+            name: rpc-tcp
+            protocol: TCP
+          - containerPort: 9109
+            name: rpc-udp
+            protocol: UDP
+        resources: {}
+        volumeMounts:
+          - name: graphite-configs
+            mountPath: '/configs'
+            readOnly: true
+          - name: graphite-exporter-cm
+            mountPath: '/tmp'
+            readOnly: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      volumes:
+        - name: graphite-configs
+          persistentVolumeClaim:
+            claimName: graphite-configs
+        - name: graphite-exporter-cm
+          configMap:
+            name: graphite-exporter-cm
+            defaultMode: 420
+            items:
+              - key: 'graphite_mapping.yaml'
+                path: 'graphite_mapping.yaml'

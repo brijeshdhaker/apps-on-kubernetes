@@ -1,0 +1,17 @@
+#
+# kubectl -n k8s-spark apply -f setup/volumes/nfs/local-nfs-pvc.yaml
+#
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: local-nfs-pvc
+  namespace: k8s-spark
+spec:
+  storageClassName: ""
+  volumeName: "local-nfs-pv"
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi

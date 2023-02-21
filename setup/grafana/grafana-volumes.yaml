@@ -1,0 +1,41 @@
+#
+# kubectl -n grafana apply -f setup/grafana/grafana-volumes.yaml
+#
+# kubectl -n grafana delete -f setup/grafana/grafana-volumes.yaml
+#
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: grafana
+  labels:
+    type: nfs
+    app: grafana
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=4.2
+  nfs:
+    path: /mnt/nfs_share/grafana
+    server: 192.168.122.1
+    readOnly: false
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: grafana
+  labels:
+    type: nfs
+    app: grafana
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi

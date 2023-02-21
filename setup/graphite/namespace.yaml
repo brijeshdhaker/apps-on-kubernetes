@@ -1,0 +1,9 @@
+#
+# kubectl -n graphite apply -f setup/graphite/namespace.yaml
+# kubectl create ns graphite
+#
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: graphite

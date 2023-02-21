@@ -1,0 +1,41 @@
+#
+# kubectl -n postgres apply -f setup/postgres/postgres-nfs-volumes.yaml
+#
+# kubectl -n postgres delete -f setup/postgres/postgres-nfs-volumes.yaml
+#
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres
+  labels:
+    type: nfs
+    app: postgres
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=4.2
+  nfs:
+    path: /mnt/nfs_share/postgres
+    server: 192.168.122.1
+    readOnly: false
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: postgres
+  labels:
+    type: nfs
+    app: postgres
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi

@@ -1,0 +1,42 @@
+#
+# kubectl -n influxdb apply -f setup/influxdb/influxdb-volumes.yaml
+#
+# kubectl -n influxdb delete -f setup/influxdb/influxdb-volumes.yaml
+#
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: influxdb-data
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=4.2
+  nfs:
+    path: /mnt/nfs_share/influxdb
+    server: 192.168.122.1
+    readOnly: false
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: influxdb-data-influxdb-0
+  labels:
+    vol: influxdb-data
+spec:
+  storageClassName: ""
+  volumeName: "influxdb-data"
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+
+---

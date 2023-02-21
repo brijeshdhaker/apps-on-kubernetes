@@ -1,0 +1,98 @@
+#
+# kubectl -n spark-apps apply -f setup/spark-apps/jobs/spark-pi-graphite-exporter.yaml
+#
+# kubectl -n spark-apps delete -f setup/spark-apps/jobs/spark-pi-graphite-exporter.yaml
+#
+# kubectl -n spark-apps get sparkapplications spark-pi-graphite -o=yaml
+#
+# kubectl -n spark-apps delete sparkapplications spark-pi-graphite
+#
+# kubectl -n spark-apps describe sparkapplication spark-pi-graphite
+#
+---
+apiVersion: "sparkoperator.k8s.io/v1beta2"
+kind: SparkApplication
+metadata:
+  name: spark-pi-graphite-exporter
+  namespace: spark-apps
+spec:
+  type: Scala
+  mode: cluster
+  image: "docker.io/brijeshdhaker/spark:3.1.2"
+  imagePullPolicy: Always
+  mainClass: org.apache.spark.examples.SparkPi
+  mainApplicationFile: "local:///opt/spark/examples/jars/spark-examples_2.12-3.1.2.jar"
+  deps:
+    packages:
+      - "ch.cern.sparkmeasure:spark-measure_2.12:0.22"
+  sparkConf:
+    spark.eventLog.enabled: 'true'
+    spark.eventLog.dir: 'file:///mnt/nfs_share/spark-logs/'
+    spark.metrics.conf: "/opt/spark/metrics/metrics.properties"
+    spark.metrics.staticSources.enabled: "true"
+    spark.metrics.appStatusSource.enabled: "true"
+    spark.executor.processTreeMetrics.enabled: "true"
+  arguments:
+    - "50000"
+  sparkVersion: "3.1.2"
+  restartPolicy:
+    type: Never
+  volumes:
+    - name: "nfs-volume"
+      nfs:
+        path: "/mnt/nfs_share"
+        server: "192.168.122.1"
+    - name: "host-volume"
+      hostPath:
+        path: "/mnt/local-share"
+        type: Directory
+    - name: "spark-volume"
+      persistentVolumeClaim:
+        claimName: "spark-volume"
+    - name: "configmap-volume"
+      configMap:
+        name: "spark-apps-configmap"
+        items:
+          - key: "graphite.metrics.properties"
+            path: "metrics.properties"
+  driver:
+    cores: 1
+    coreLimit: "1000m"
+    memory: "512m"
+    labels:
+      app.kubernetes.io/version: 3.1.2
+      app.kubernetes.io/component: spark-driver
+      app.kubernetes.io/part-of: spark
+      app.kubernetes.io/managed-by: self
+      app.kubernetes.io/metrics-by: prometheus
+      app: spark
+    serviceAccount: spark
+    volumeMounts:
+      - name: "nfs-volume"
+        mountPath: "/mnt/nfs_share"
+      - name: "configmap-volume"
+        mountPath: "/opt/spark/metrics"
+      - name: "spark-volume"
+        mountPath: "/mnt/spark-apps"
+    javaOptions: "-Divy.cache.dir=/tmp -Divy.home=/tmp"
+  executor:
+    cores: 1
+    coreLimit: "1000m"
+    instances: 1
+    memory: "512m"
+    labels:
+      app.kubernetes.io/version: 3.1.2
+      app.kubernetes.io/component: spark-executor
+      app.kubernetes.io/part-of: spark
+      app.kubernetes.io/managed-by: self
+      app.kubernetes.io/metrics-by: prometheus
+      app: spark
+    volumeMounts:
+      - name: "nfs-volume"
+        mountPath: "/mnt/nfs_share"
+      - name: "configmap-volume"
+        mountPath: "/opt/spark/metrics"
+      - name: "spark-volume"
+        mountPath: "/mnt/spark-apps"
+    javaOptions: "-Divy.cache.dir=/tmp -Divy.home=/tmp"
+

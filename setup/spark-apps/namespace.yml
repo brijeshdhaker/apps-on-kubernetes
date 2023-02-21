@@ -1,0 +1,15 @@
+#
+# kubectl -n k8s-spark apply -f setup/spark-apps/namespace.yml
+#
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    kubernetes.io/metadata.name: spark-apps
+  name: spark-apps
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active

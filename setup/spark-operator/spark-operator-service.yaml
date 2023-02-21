@@ -1,0 +1,26 @@
+#
+# kubectl -n spark-operator apply -f setup/spark-operator/spark-operator-service.yaml
+#
+# kubectl -n spark-operator delete -f setup/spark-operator/spark-operator-service.yaml
+#
+# kubectl -n spark-operator port-forward svc/spark-operator-service 10254:10254
+#
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-operator-service
+  namespace: spark-operator
+  labels:
+    app.kubernetes.io/name: spark-operator-service
+    app.kubernetes.io/component: spark-operator
+    app.kubernetes.io/metrics-by: prometheus
+spec:
+  ports:
+    - name: spark-operator-metrics
+      port: 10254
+      targetPort: 10254
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: spark-operator

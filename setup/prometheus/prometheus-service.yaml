@@ -1,0 +1,23 @@
+#
+# kubectl -n prometheus apply -f setup/prometheus/prometheus-service.yaml
+#
+# kubectl -n prometheus delete -f setup/prometheus/prometheus-service.yaml
+#
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-service
+  namespace: prometheus
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/port:   '9090'
+spec:
+  selector:
+    app: prometheus
+  type: NodePort
+  ports:
+    - port: 9090
+      targetPort: 9090
+      nodePort: 30090
+

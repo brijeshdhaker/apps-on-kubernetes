@@ -1,8 +1,0 @@
-#
-# kubectl apply -f setup/local/grafana/namespace.yaml
-#
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: grafana

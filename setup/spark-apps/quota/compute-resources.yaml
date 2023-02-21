@@ -1,0 +1,22 @@
+#
+# kubectl -n spark-apps apply -f setup/spark-apps/quota/compute-resources.yaml
+# kubectl -n spark-apps delete -f setup/spark-apps/quota/compute-resources.yaml
+# kubectl -n spark-apps get quota
+# kubectl -n spark-apps describe quota compute-resources
+# kubectl -n spark-apps create deployment nginx --image=nginx --replicas=1
+#
+# kubectl --namespace=myspace create quota test --hard=count/deployments.apps=2,count/replicasets.apps=4,count/pods=3,count/secrets=4
+---
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-resources
+spec:
+  hard:
+    requests.cpu: "1"
+    requests.memory: 1Gi
+    limits.cpu: "4"
+    limits.memory: 4Gi
+#    requests.nvidia.com/gpu: 1
+#    limits.nvidia.com/gpu: 4

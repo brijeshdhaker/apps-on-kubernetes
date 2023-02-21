@@ -1,8 +1,0 @@
-#
-# kubectl apply -f setup/local/prometheus/namespace.yaml
-#
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: prometheus

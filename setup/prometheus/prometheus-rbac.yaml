@@ -1,0 +1,108 @@
+#
+# kubectl -n prometheus apply -f setup/prometheus/prometheus-rbac.yaml
+#
+# kubectl -n prometheus delete -f setup/prometheus/prometheus-rbac.yaml
+#
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prometheus-roles
+  namespace: prometheus
+rules:
+  - apiGroups: [""] # "" indicates the core API group
+    resources: ["services", "endpoints", "pods"]
+    verbs: [ "get", "list", "watch", "create", "update", "delete", "patch" ]
+  - apiGroups: [ "batch", "extensions" ]
+    resources: [ "jobs" ]
+    verbs: [ "get", "list", "watch", "create", "update", "delete", "patch" ]
+  - apiGroups: [""]
+    resources: ["pods/logs"]
+    verbs: [ "get", "list", "watch", "create", "update", "delete", "patch" ]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: [ "get", "list", "watch", "create", "update", "delete", "patch" ]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["list"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prometheus-rbac
+  namespace: prometheus
+roleRef:
+  kind: Role # This must be Role or ClusterRole
+  name: prometheus-roles # This must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: prometheus   # Name of the ServiceAccount
+    namespace: prometheus
+
+
+---
+
+# Role for spark-on-k8s-operator to create resources on cluster
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: prometheus-cluster-role
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  labels:
+    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-edit: "true"
+rules:
+  - apiGroups:
+      - '*'
+    resources:
+      - '*'
+    verbs:
+      - '*'
+  - nonResourceURLs:
+      - '*'
+    verbs:
+      - '*'
+
+---
+
+# Allow prometheus-worker service account access for spark-on-k8s
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus-cluster-rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus-cluster-role
+subjects:
+  - kind: ServiceAccount
+    name: prometheus
+    namespace: prometheus
+
+---
+#
+# kubectl create clusterrolebinding prometheus-cluster-admin-binding --clusterrole=cluster-admin --serviceaccount=prometheus:prometheus --dry-run -o yaml
+#
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  creationTimestamp: null
+  name: prometheus-cluster-admin-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: prometheus
+    namespace: prometheus
+
+
+
+---
