@@ -1,5 +1,5 @@
 #
-# kubectl apply -f setup/admin/user-csr.yaml
+# kubectl apply -f admin/user/brijeshdhaker-csr.yaml
 #
 ---
 

@@ -1,7 +1,7 @@
 #
-# kubectl -n kubernetes-dashboard apply -f setup/kubernetes-dashboard/admin-user-rbac.yaml
+# kubectl -n kubernetes-dashboard apply -f setup/dashboard/admin-user-rbac.yaml
 #
-# kubectl -n kubernetes-dashboard delete -f setup/kubernetes-dashboard/admin-user-rbac.yaml
+# kubectl -n kubernetes-dashboard delete -f setup/dashboard/admin-user-rbac.yaml
 #
 ---
 
