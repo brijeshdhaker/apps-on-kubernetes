@@ -19,9 +19,16 @@ systemctl daemon-reload && systemctl restart kubelet
 /etc/kubernetes/bootstrap-kubelet.conf
 
 
-http://192.168.122.95:10255/metrics
-http://192.168.122.95:10255/metrics/cadvisor
-http://192.168.122.95:10255/metrics/probes
+http://k8c1m0:10255/metrics
+http://k8c1m0:10255/metrics/cadvisor
+http://k8c1m0:10255/metrics/probes
+
+#
+# Kubelet APIS
+# Kubelet is instrumented and exposes the /metrics endpoint by default through the port 10250
+#
+https://k8c1m0:10250/metrics
+
 
 #
 # SSL HIT
@@ -70,7 +77,6 @@ curl -k --header "Authorization: Bearer $TOKEN"  https://kubernetes/api/v1/nodes
 
 
 
-curl -v -GET --cacert admin/user/ca.crt --key admin/user/brijeshdhaker.key --cert admin/user/brijeshdhaker.crt https://192.168.122.95:6443/api/v1/namespaces
+curl -v -GET --cacert admin/user/ca.crt --key admin/user/brijeshdhaker.key --cert admin/user/brijeshdhaker.crt https://k8c1m0:6443/api/v1/namespaces
 curl -GET --cacert admin/user/ca.crt --key admin/user/brijeshdhaker.key --cert admin/user/brijeshdhaker.crt https://k8c1m0:6443/api/v1/namespaces/engineering/pods/$HOSTNAME
-
 curl -GET --cacert admin/user/ca.crt --key admin/user/brijeshdhaker.key --cert admin/user/brijeshdhaker.crt https://k8c1m0:6443/api/v1/nodes/$NODE_NAME/proxy/runningpods/

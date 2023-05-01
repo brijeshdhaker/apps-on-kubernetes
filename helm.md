@@ -1,4 +1,16 @@
 #
+# Helm Commands
+#
+helm repo list
+
+# Helm 3
+helm install [RELEASE_NAME] prometheus-community/prometheus
+# Helm 2
+helm install --name [RELEASE_NAME] prometheus-community/prometheus
+
+
+
+#
 # Apache Airflow
 #
 
@@ -36,15 +48,7 @@ $ helm status --namespace spark-operator spark-operator
 ## Uninstall 
 $ helm uninstall spark-operator --namespace spark-operator
 
-#
-# Helm Commands
-#
-helm repo list
 
-# Helm 3
-helm install [RELEASE_NAME] prometheus-community/prometheus
-# Helm 2
-helm install --name [RELEASE_NAME] prometheus-community/prometheus
 
 
 #
@@ -110,3 +114,10 @@ helm repo add influxdata https://helm.influxdata.com/
 helm repo update
 helm install influxdb influxdata/influxdb --namespace influxdb --create-namespace
 helm uninstall influxdb --namespace influxdb
+
+#
+# metrics-server
+#
+helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+helm upgrade --install metrics-server metrics-server/metrics-server
+helm uninstall metrics-server --namespace default
