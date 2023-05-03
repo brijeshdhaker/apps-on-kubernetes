@@ -18,7 +18,7 @@ spec:
   mountOptions:
     - nfsvers=4.2
   nfs:
-    path: /mnt/nfs_share/influxdb
+    path: /mnt/nfs-share/influxdb
     server: 192.168.122.1
     readOnly: false
 

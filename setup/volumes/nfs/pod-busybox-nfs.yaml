@@ -1,6 +1,6 @@
 #
 # kubectl apply -f setup/volumes/nfs/pod-busybox-nfs.yaml
-# kubectl exec -it pod-busybox-nfs -- ls /mnt/nfs_share/nfs-dir
+# kubectl exec -it pod-busybox-nfs -- ls /mnt/nfs-share/nfs-dir
 #
 
 apiVersion: v1
@@ -20,7 +20,7 @@ spec:
     imagePullPolicy: IfNotPresent
     name: busybox
     volumeMounts:
-      - mountPath: /mnt/nfs_share
+      - mountPath: /mnt/nfs-share
         name: local-nfs-vol
       - mountPath: /mnt/nfs-dir
         name: nfs-volume
@@ -31,5 +31,5 @@ spec:
     - name: nfs-volume
       nfs:
         server: 192.168.122.1
-        path: /mnt/nfs_share/nfs-dir
+        path: /mnt/nfs-share/nfs-dir
         readOnly: true

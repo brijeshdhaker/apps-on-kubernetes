@@ -5,7 +5,7 @@
 #
 # Create a service for a pod valid-pod, which serves on port 444 with the name "frontend"
 # kubectl -n spark-apps expose pod spark-historyserver --port=18080 --name=spark-historyserver --type=LoadBalancer
-# kubectl -n spark-apps exec -it spark-historyserver -- 'ls -lart /mnt/nfs_share/spark/history-server/logs'
+# kubectl -n spark-apps exec -it spark-historyserver -- 'ls -lart /mnt/nfs-share/spark/history-server/logs'
 
 ---
 # public class SparkThriftServerRunner {
@@ -73,11 +73,11 @@ spec:
           mountPath: '/opt/spark/conf'
           readOnly: true
         - name:  nfs-share
-          mountPath: '/mnt/nfs_share'
+          mountPath: '/mnt/nfs-share'
   volumes:
     - name: nfs-share
       nfs:
-        path: /mnt/nfs_share
+        path: /mnt/nfs-share
         server: 192.168.122.1
     - name: spark-configs-volume
       configMap:

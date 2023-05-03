@@ -1,12 +1,11 @@
 #
-# kubectl -n k8s-spark apply -f setup/volumes/local-storage/local-storage-pv.yaml
+# kubectl -n k8s-spark apply -f setup/volumes/nfs-storage/nfs-storage-pv.yaml
 #
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: local-storage-pv
-  namespace: k8s-spark
+  name: nfs-storage-pv
 spec:
   capacity:
     storage: 100Gi
@@ -15,9 +14,9 @@ spec:
     - ReadWriteOnce
   # It will not be automatically deleted when a user deletes claim
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
+  storageClassName: nfs-storage
   local:
-    path: /mnt/local-share
+    path: /mnt/nfs-share
   nodeAffinity:
     required:
       nodeSelectorTerms:

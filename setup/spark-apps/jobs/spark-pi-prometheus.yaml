@@ -25,7 +25,7 @@ spec:
   mainApplicationFile: "local:///opt/spark/examples/jars/spark-examples_2.12-3.1.2.jar"
   sparkConf:
     spark.eventLog.enabled: 'true'
-    spark.eventLog.dir: 'file:///mnt/nfs_share/spark-logs/'
+    spark.eventLog.dir: 'file:///mnt/nfs-share/spark-logs/'
     spark.ui.prometheus.enabled: "true"
     spark.metrics.conf: "/opt/spark/metrics/metrics.properties"
     spark.metrics.staticSources.enabled: "true"
@@ -46,7 +46,7 @@ spec:
   volumes:
     - name: "nfs-volume"
       nfs:
-        path: "/mnt/nfs_share"
+        path: "/mnt/nfs-share"
         server: "192.168.122.1"
     - name: "host-volume"
       hostPath:
@@ -82,7 +82,7 @@ spec:
     serviceAccount: spark
     volumeMounts:
       - name: "nfs-volume"
-        mountPath: "/mnt/nfs_share"
+        mountPath: "/mnt/nfs-share"
       - name: "configmap-volume"
         mountPath: "/opt/spark/metrics"
       - name: "spark-volume"
@@ -100,7 +100,7 @@ spec:
       app.kubernetes.io/metrics-by: prometheus
     volumeMounts:
       - name: "nfs-volume"
-        mountPath: "/mnt/nfs_share"
+        mountPath: "/mnt/nfs-share"
       - name: "configmap-volume"
         mountPath: "/opt/spark/metrics"
       - name: "spark-volume"

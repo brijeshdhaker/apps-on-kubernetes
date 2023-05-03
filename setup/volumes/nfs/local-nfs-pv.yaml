@@ -16,6 +16,6 @@ spec:
   mountOptions:
     - nfsvers=4.2
   nfs:
-    path: /mnt/nfs_share
+    path: /mnt/nfs-share
     server: 192.168.122.1
     readOnly: false

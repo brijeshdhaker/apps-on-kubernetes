@@ -18,7 +18,7 @@ spec:
   mountOptions:
     - nfsvers=4.2
   nfs:
-    path: /mnt/nfs_share/airflow/dags
+    path: /mnt/nfs-share/airflow/dags
     server: 192.168.122.1
     readOnly: false
 
@@ -54,7 +54,7 @@ spec:
   mountOptions:
     - nfsvers=4.2
   nfs:
-    path: /mnt/nfs_share/airflow/logs
+    path: /mnt/nfs-share/airflow/logs
     server: 192.168.122.1
     readOnly: false
 
@@ -90,7 +90,7 @@ spec:
   mountOptions:
     - nfsvers=4.2
   nfs:
-    path: /mnt/nfs_share/airflow/templates
+    path: /mnt/nfs-share/airflow/templates
     server: 192.168.122.1
     readOnly: false
 

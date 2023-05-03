@@ -18,7 +18,7 @@ spec:
   mountOptions:
     - nfsvers=4.2
   nfs:
-    path: /mnt/nfs_share/graphite/data
+    path: /mnt/nfs-share/graphite/data
     server: 192.168.122.1
     readOnly: false
 
@@ -53,7 +53,7 @@ spec:
   mountOptions:
     - nfsvers=4.2
   nfs:
-    path: /mnt/nfs_share/graphite/configs
+    path: /mnt/nfs-share/graphite/configs
     server: 192.168.122.1
     readOnly: false
 

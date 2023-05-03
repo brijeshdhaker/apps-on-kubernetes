@@ -63,6 +63,7 @@ $ curl -k -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/service
 $ curl --cacert /etc/kubernetes/pki/ca.crt -H "Authorization: Bearer $(cat /etc/kubernetes/pki/sa.key)" https://localhost:10257/metrics
 $ curl -k --cacert /etc/kubernetes/pki/ca.crt --cert /etc/kubernetes/pki/front-proxy-client.crt --key /etc/kubernetes/pki/front-proxy-client.key https://localhost:10257/metrics
 
+$ curl -k --cacert /etc/kubernetes/pki/ca.crt --cert /root/client.crt --key /root/client.key https://localhost:10257/metrics
 
 #
 # Monitor kube-proxy
@@ -71,17 +72,13 @@ $ curl -k --cacert /etc/kubernetes/pki/ca.crt --cert /etc/kubernetes/pki/front-p
 
 curl http://127.0.0.1:10249/metrics
 
-curl http://k8c1m0:10249/metrics
-
-
 #
-#
+# Monitor CoreDNS
 #
 
 kubectl get ep kube-dns -n kube-system -o json |jq -r ".subsets"
+curl http://172.16.182.140:9153/metrics
 
-curl http://localhost:9153/metrics
-curl http://k8c1m0:9153/metrics
 
 # kubectl get svc -n kube-system
 NAME       TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)                  AGE

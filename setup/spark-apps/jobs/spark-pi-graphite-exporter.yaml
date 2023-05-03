@@ -27,7 +27,7 @@ spec:
       - "ch.cern.sparkmeasure:spark-measure_2.12:0.22"
   sparkConf:
     spark.eventLog.enabled: 'true'
-    spark.eventLog.dir: 'file:///mnt/nfs_share/spark-logs/'
+    spark.eventLog.dir: 'file:///mnt/nfs-share/spark-logs/'
     spark.metrics.conf: "/opt/spark/metrics/metrics.properties"
     spark.metrics.staticSources.enabled: "true"
     spark.metrics.appStatusSource.enabled: "true"
@@ -40,7 +40,7 @@ spec:
   volumes:
     - name: "nfs-volume"
       nfs:
-        path: "/mnt/nfs_share"
+        path: "/mnt/nfs-share"
         server: "192.168.122.1"
     - name: "host-volume"
       hostPath:
@@ -69,7 +69,7 @@ spec:
     serviceAccount: spark
     volumeMounts:
       - name: "nfs-volume"
-        mountPath: "/mnt/nfs_share"
+        mountPath: "/mnt/nfs-share"
       - name: "configmap-volume"
         mountPath: "/opt/spark/metrics"
       - name: "spark-volume"
@@ -89,7 +89,7 @@ spec:
       app: spark
     volumeMounts:
       - name: "nfs-volume"
-        mountPath: "/mnt/nfs_share"
+        mountPath: "/mnt/nfs-share"
       - name: "configmap-volume"
         mountPath: "/opt/spark/metrics"
       - name: "spark-volume"

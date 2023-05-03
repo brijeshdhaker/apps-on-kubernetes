@@ -20,7 +20,7 @@ spec:
     imagePullPolicy: IfNotPresent
     name: busybox
     volumeMounts:
-      - mountPath: /mnt/local-share
+      - mountPath: /mnt/nfs-share
         name: local-storage-vol
   volumes:
     - name: local-storage-vol

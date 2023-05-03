@@ -54,16 +54,16 @@ $SPARK_HOME/bin/spark-submit \
 --conf spark.kubernetes.container.image=docker.io/brijeshdhaker/spark:3.1.2-k8s \
 --conf "spark.kubernetes.namespace=k8s-spark" \
 --conf "spark.eventLog.enabled=true" \
---conf "spark.eventLog.dir=file:///mnt/nfs_share/spark/history-server/logs/" \
+--conf "spark.eventLog.dir=file:///mnt/nfs-share/spark/history-server/logs/" \
 --conf "spark.kubernetes.authenticate.serviceAccountName=spark" \
 --conf "spark.kubernetes.authenticate.driver.serviceAccountName=spark" \
---conf "spark.kubernetes.driver.volumes.nfs.driver-pvc.mount.path=/mnt/nfs_share" \
+--conf "spark.kubernetes.driver.volumes.nfs.driver-pvc.mount.path=/mnt/nfs-share" \
 --conf "spark.kubernetes.driver.volumes.nfs.driver-pvc.options.server=192.168.122.1" \
---conf "spark.kubernetes.driver.volumes.nfs.driver-pvc.options.path=/mnt/nfs_share" \
+--conf "spark.kubernetes.driver.volumes.nfs.driver-pvc.options.path=/mnt/nfs-share" \
 --conf "spark.kubernetes.driver.volumes.nfs.driver-pvc.options.readOnly=false" \
---conf "spark.kubernetes.executor.volumes.nfs.exec-pvc.mount.path=/mnt/nfs_share" \
+--conf "spark.kubernetes.executor.volumes.nfs.exec-pvc.mount.path=/mnt/nfs-share" \
 --conf "spark.kubernetes.executor.volumes.nfs.exec-pvc.options.server=192.168.122.1" \
---conf "spark.kubernetes.executor.volumes.nfs.exec-pvc.options.path=/mnt/nfs_share" \
+--conf "spark.kubernetes.executor.volumes.nfs.exec-pvc.options.path=/mnt/nfs-share" \
 --conf "spark.kubernetes.executor.volumes.nfs.exec-pvc.options.readOnly=false" \
 --conf "spark.driver.extraJavaOptions=-Divy.cache.dir=/tmp -Divy.home=/tmp" \
 local:///opt/spark/examples/jars/spark-examples_2.12-3.1.2.jar  10000
@@ -136,16 +136,16 @@ $SPARK_HOME/bin/spark-submit \
 --conf spark.kubernetes.container.image=docker.io/brijeshdhaker/spark:3.1.2-k8s \
 --conf "spark.kubernetes.namespace=k8s-spark" \
 --conf "spark.eventLog.enabled=true" \
---conf "spark.eventLog.dir=file:///mnt/nfs_share/spark/history-server/logs/" \
+--conf "spark.eventLog.dir=file:///mnt/nfs-share/spark/history-server/logs/" \
 --conf "spark.kubernetes.authenticate.serviceAccountName=spark" \
 --conf "spark.kubernetes.authenticate.driver.serviceAccountName=spark" \
---conf "spark.kubernetes.driver.volumes.nfs.driver-pvc.mount.path=/mnt/nfs_share" \
+--conf "spark.kubernetes.driver.volumes.nfs.driver-pvc.mount.path=/mnt/nfs-share" \
 --conf "spark.kubernetes.driver.volumes.nfs.driver-pvc.options.server=192.168.122.1" \
---conf "spark.kubernetes.driver.volumes.nfs.driver-pvc.options.path=/mnt/nfs_share" \
+--conf "spark.kubernetes.driver.volumes.nfs.driver-pvc.options.path=/mnt/nfs-share" \
 --conf "spark.kubernetes.driver.volumes.nfs.driver-pvc.options.readOnly=false" \
---conf "spark.kubernetes.executor.volumes.nfs.exec-pvc.mount.path=/mnt/nfs_share" \
+--conf "spark.kubernetes.executor.volumes.nfs.exec-pvc.mount.path=/mnt/nfs-share" \
 --conf "spark.kubernetes.executor.volumes.nfs.exec-pvc.options.server=192.168.122.1" \
---conf "spark.kubernetes.executor.volumes.nfs.exec-pvc.options.path=/mnt/nfs_share" \
+--conf "spark.kubernetes.executor.volumes.nfs.exec-pvc.options.path=/mnt/nfs-share" \
 --conf "spark.kubernetes.executor.volumes.nfs.exec-pvc.options.readOnly=false" \
 --conf "spark.driver.extraJavaOptions=-Divy.cache.dir=/tmp -Divy.home=/tmp" \
 local:///opt/spark/examples/jars/spark-examples_2.12-3.1.2.jar  10000

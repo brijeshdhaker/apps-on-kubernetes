@@ -20,7 +20,7 @@ spec:
   mountOptions:
     - nfsvers=4.2
   nfs:
-    path: /mnt/nfs_share/prometheus
+    path: /mnt/nfs-share/prometheus
     server: 192.168.122.1
     readOnly: false
 ---
