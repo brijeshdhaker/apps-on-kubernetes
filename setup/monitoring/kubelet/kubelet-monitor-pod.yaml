@@ -1,0 +1,42 @@
+#
+# kubectl -n monitoring apply -f setup/monitoring/kubelet/kubelet-monitor-pod.yaml
+#
+# kubectl -n monitoring exec -it kubelet-monitor -- /bin/bash
+
+#
+## Access metrics within POD
+#
+# export CACERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+# export TOKEN=`cat /var/run/secrets/kubernetes.io/serviceaccount/token`
+# export API_SERVER=https://kubernetes.default.svc.cluster.local
+# export NODE_NAME=k8c1m0
+# curl -k -v -GET --cacert ${CACERT} --header "Authorization: Bearer $TOKEN"  ${API_SERVER}/api/v1/nodes/$NODE_NAME/proxy/containerLogs/kube-system/coredns-1234567890-abcde/coredns
+
+#
+## Access metrics within POD
+#
+# export API_SERVER=$(kubectl config view | grep server | cut -f 2- -d ":" | tr -d " ")
+# export API_SERVER=https://k8c1m0:6443
+# curl -k --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --header "Authorization: Bearer $TOKEN"  https://$NODE_NAME:10250/metrics
+# curl -k --header "Authorization: Bearer $TOKEN"  https://kubernetes.default.svc.cluster.local/api/v1/nodes/$NODE_NAME/proxy/metrics
+#
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kubelet-monitor
+  namespace: monitoring
+spec:
+  serviceAccountName: kubelet-monitor
+  containers:
+    - name: kubelet-monitor
+      image: ubuntu:22.04
+      command:
+        - /bin/bash
+        - -c
+        - "sleep 1000000"
+      env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName

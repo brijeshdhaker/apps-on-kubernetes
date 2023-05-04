@@ -1,0 +1,17 @@
+#
+# kubectl -n monitoring apply -f setup/monitoring/kubelet/kubelet-monitor-clusterRoleBinding.yaml
+#
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: KubeletMonitorClusterRoleBinding
+  namespace: monitoring
+roleRef:
+  kind: ClusterRole
+  name: KubeletMonitorClusterRole
+  apiGroup: "rbac.authorization.k8s.io"
+subjects:
+  - kind: ServiceAccount
+    name: kubelet-monitor
+    namespace: monitoring

@@ -1,0 +1,34 @@
+#
+# kubectl -n monitoring apply -f setup/monitoring/kubelet/kubelet-monitor-clusterRole.yaml
+#
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  # "namespace" omitted since ClusterRoles are not namespaced
+  name: KubeletMonitorClusterRole
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - proxy
+  - apiGroups:
+      - ""
+    resources:
+      - nodes/log
+      - nodes/metrics
+      - nodes/proxy
+      - nodes/spec
+      - nodes/stats
+    verbs:
+      - '*'
